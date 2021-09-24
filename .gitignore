@@ -1,0 +1,8 @@
+bin/
+obj/
+
+### VScode folders
+.vs/
+
+### Nunit lite standard result fil
+TestResult.xml
