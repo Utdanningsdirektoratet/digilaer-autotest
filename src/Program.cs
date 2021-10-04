@@ -1,18 +1,16 @@
 ﻿using System;
 using OpenQA.Selenium;
+using NUnitLite;
 
 namespace digilaer_autotest
 {
     public class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            IWebDriver driver = Selenium.SeleniumSetup.GetSeleniumDriver();
-            
-            driver.Navigate().GoToUrl("https://digilaer.no");
-            driver.Close();
+            Console.WriteLine("Digilær Autotest start");
 
+            return new AutoRun().Execute(args); 
         }
     }
 }
