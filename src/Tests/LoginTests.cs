@@ -25,6 +25,7 @@ namespace TestSuite
         public void Cleanup() {
             Console.WriteLine("OneTimeTearDown begin");
             driver.Close();
+            Slack.SlackClient.CallSlack("Digilær-tester ferdigkjørt.");
             Console.WriteLine("OneTimeTearDown finished");
         }
 
