@@ -8,7 +8,7 @@ namespace Slack
         private static string baseSlackUrl = "https://hooks.slack.com/";
         private static string webhookPassword = "Get from properties";
         private static string slackHookUrl = "services/" + webhookPassword;
-        private static string slackChannel = "#siri"; // Temp kanalnavn for test. Opprett f eks #digilaer-autotest i stedet
+        private static string slackChannel = "#autotest_digilær";
 
         private static string slackUserName = "Digilær Autotest";
 
