@@ -10,7 +10,7 @@ namespace digilaer_autotest
         {
             Console.WriteLine("Digilær Autotest start");
 
-            return new AutoRun().Execute(args); 
+            return new AutoRun().Execute(args);
         }
     }
 }
