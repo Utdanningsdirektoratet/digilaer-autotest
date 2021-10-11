@@ -16,7 +16,7 @@ namespace Slack
         {
             HttpClient client = new HttpClient();
             
-            string slackEmoji =  ":construction2:";
+            string slackEmoji =  ":digilaer:";
 
             string content = "{\"channel\" : \"" + slackChannel + "\", \"username\": \"" + slackUserName + "\", \"text\": \""+ slackText +"\", \"icon_emoji\": \"" + slackEmoji + "\"}";
             client.BaseAddress = new System.Uri(baseSlackUrl);

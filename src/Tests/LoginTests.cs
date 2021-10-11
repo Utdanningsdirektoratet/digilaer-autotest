@@ -1,7 +1,9 @@
 using System;
 using System.Threading;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using OpenQA.Selenium;
+using Slack;
 
 namespace TestSuite
 {
@@ -13,32 +15,67 @@ namespace TestSuite
         private string fagkodeSelenium = "SEL";
         private string elevFeideFnr = "fra properties";
         private string feidePw = "fra properties";
+        
+        private string resultatTekst = "";
 
         [OneTimeSetUp]
-        public void Init() {
+        public void Init()
+        {
             Console.WriteLine("OneTimeSetUp begin");
             driver = Selenium.SeleniumSetup.GetSeleniumDriver();
             Console.WriteLine("OneTimeSetUp finished");
         }
 
         [OneTimeTearDown]
-        public void Cleanup() {
+        public void AfterTestsFinished()
+        {
             Console.WriteLine("OneTimeTearDown begin");
             driver.Close();
-            Slack.SlackClient.CallSlack("Digilær-tester ferdigkjørt.");
+
+            sendSlackResultat();
+
             Console.WriteLine("OneTimeTearDown finished");
         }
 
+        private void sendSlackResultat() 
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed)
+            {
+                resultatTekst = TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n" + resultatTekst;
+                resultatTekst += "\n Kanskje <@joakimbjerkheim> tar en titt?";
+            } else 
+            {
+                Console.WriteLine("Digitester ferdig uten feil");
+                resultatTekst = "Alle " + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n" + resultatTekst;
+            }
+            SlackClient.CallSlack(resultatTekst);
+        }
+
+        [TearDown]
+        public void AfterEachTest() 
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed))
+            {
+                resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n";
+            }
+            else if (TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
+            {
+                resultatTekst += ":x:" + TestContext.CurrentContext.Test.Name + "\n";
+            }
+        }
+
         [Test]
-        [TestCase(TestName = "1. Åpne digilær hovedside")]
-        public void goToDigiLaerFrontPage() {
+        [TestCase(TestName = "Åpne digilær hovedside")]
+        public void goToDigiLaerFrontPage()
+        {
           driver.Navigate().GoToUrl("https://digilaer.no");  
             Assert.That(driver.PageSource.ToLower().Contains("nasjonal"));
         }
 
         [Test]
-        [TestCase(TestName = "2. Test at målform kan endres")]
-        public void testAtMaalFormKanEndres() {
+        [TestCase(TestName = "Test at målform kan endres")]
+        public void testAtMaalFormKanEndres()
+        {
             driver.Navigate().GoToUrl("https://digilaer.no");
 
             driver.FindElement(By.Id("language-switcher")).Click();
@@ -53,16 +90,16 @@ namespace TestSuite
         }
 
         [Test]
-        [TestCase(TestName = "3. Åpne skole.digilær hovedside")]
-        public void goToSkoleDigiLaerFrontPage() 
+        [TestCase(TestName = "Åpne skole.digilær hovedside")]
+        public void goToSkoleDigiLaerFrontPage()
         {    
             driver.Navigate().GoToUrl("https://skole.digilaer.no");
             Assert.That(driver.PageSource.ToLower().Contains("velkommen"), Is.True);
         } 
 
         [Test]
-        [TestCase(TestName = "4. Logg inn og ut av digilær med Feide")]
-        public void logInAndOutDigilaerWithFeide() 
+        [TestCase(TestName = "Logg inn og ut av digilær med Feide")]
+        public void logInAndOutDigilaerWithFeide()
         {
             driver.Navigate().GoToUrl("https://digilaer.no");
 
@@ -72,16 +109,18 @@ namespace TestSuite
         }   
 
         [Test]
-        [TestCase(TestName = "5. Logg inn og ut av skole.digilær med Feide")]
-        public void logInAndOutSkoleDigilaerWithFeide() {
+        [TestCase(TestName = "Logg inn og ut av skole.digilær med Feide")]
+        public void logInAndOutSkoleDigilaerWithFeide()
+        {
             driver.Navigate().GoToUrl("https://skole.digilaer.no");
             LoggInnMedFeide("Logg inn her", elevFeideFnr, feidePw);  
             LoggUt();
         }
     
         [Test]
-        [TestCase(TestName = "6. Sjekk tilgang til fag")]
-        public void sjekkTilgangTilFag() {
+        [TestCase(TestName = "Sjekk tilgang til fag")]
+        public void sjekkTilgangTilFag()
+        {
             driver.Navigate().GoToUrl("https://skole.digilaer.no");
             LoggInnMedFeide("Logg inn her", elevFeideFnr, feidePw);
 
@@ -114,7 +153,7 @@ namespace TestSuite
             Assert.That(driver.PageSource.Contains("usermenu"), Is.True);
         }
  
-        private void LoggUt() 
+        private void LoggUt()
         {
             driver.FindElement(By.ClassName("usermenu")).Click();
             Thread.Sleep(1000);            
