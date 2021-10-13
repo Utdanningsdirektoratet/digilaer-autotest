@@ -4,6 +4,7 @@ using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using OpenQA.Selenium;
 using Slack;
+using Utils;
 
 namespace TestSuite
 {
@@ -22,6 +23,7 @@ namespace TestSuite
         public void Init()
         {
             Console.WriteLine("OneTimeSetUp begin");
+            LogWriter.LogWrite("Starter seleniumtest.");
             driver = Selenium.SeleniumSetup.GetSeleniumDriver();
             Console.WriteLine("OneTimeSetUp finished");
         }
@@ -30,11 +32,13 @@ namespace TestSuite
         public void AfterTestsFinished()
         {
             Console.WriteLine("OneTimeTearDown begin");
-            driver.Close();
+            
+            driver.Quit();
 
             sendSlackResultat();
 
             Console.WriteLine("OneTimeTearDown finished");
+            LogWriter.LogWrite("Test ferdig.");
         }
 
         private void sendSlackResultat() 
@@ -58,7 +62,8 @@ namespace TestSuite
             {
                 resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n";
             }
-            else if (TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
+            else if (TestContext.CurrentContext.Result.Outcome.Equals(TestStatus.Failed) ||  
+            TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) || TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
             {
                 resultatTekst += ":x:" + TestContext.CurrentContext.Test.Name + "\n";
             }
@@ -98,47 +103,67 @@ namespace TestSuite
         } 
 
         [Test]
-        [TestCase(TestName = "Logg inn og ut av digilær med Feide")]
+        [TestCase(TestName = "Logg inn med Feide via digilaer.no")]
         public void logInAndOutDigilaerWithFeide()
         {
             driver.Navigate().GoToUrl("https://digilaer.no");
 
-            LoggInnMedFeide("Logg inn", elevFeideFnr, feidePw);
+            LoggInnMedFeide(elevFeideFnr, feidePw);
 
             LoggUt();
-        }   
+        }
 
         [Test]
         [TestCase(TestName = "Logg inn og ut av skole.digilær med Feide")]
         public void logInAndOutSkoleDigilaerWithFeide()
         {
-            driver.Navigate().GoToUrl("https://skole.digilaer.no");
-            LoggInnMedFeide("Logg inn her", elevFeideFnr, feidePw);  
-            LoggUt();
-        }
+            try
+			{
+                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                LoggInnMedFeide(elevFeideFnr, feidePw);  
+                LoggUt();
+            } catch (Exception e)
+            {
+                Printscreen.TakeScreenShot(driver, "innUtSkoleDig");
+                LogWriter.LogWrite("logInAndOutSkoleDigilaerWithFeide failed.. StackTrace:");
+                LogWriter.LogWrite(e.StackTrace);
+                LoggUt();
+            }
+        } 
     
         [Test]
         [TestCase(TestName = "Sjekk tilgang til fag")]
         public void sjekkTilgangTilFag()
         {
-            driver.Navigate().GoToUrl("https://skole.digilaer.no");
-            LoggInnMedFeide("Logg inn her", elevFeideFnr, feidePw);
+            try
+            {
+                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                LoggInnMedFeide(elevFeideFnr, feidePw);
 
-            driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
-            string pageSource = driver.PageSource;
+                driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
+                string pageSource = driver.PageSource;
 
-            Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
-            Assert.That(pageSource.ToLower().Contains("emne 4"), Is.True);
+                Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
+                Assert.That(pageSource.ToLower().Contains("emne 4"), Is.True);
 
-            LoggUt();
+                LoggUt();
+            } catch (Exception e) 
+            {
+                Printscreen.TakeScreenShot(driver, "sjekkFagtilgang");
+                LogWriter.LogWrite("sjekkTilgangTilFag failed.. StackTrace:");
+                LogWriter.LogWrite(e.StackTrace);
+                LoggUt();
+            } 
         }
     
-        private void LoggInnMedFeide(string loggInnLinkTekst, string brukernavn, string passord)
+        private void LoggInnMedFeide(string brukernavn, string passord)
         {
-            Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.False);
-            
-            driver.FindElement(By.LinkText(loggInnLinkTekst)).Click();
-            
+            driver.FindElement(By.LinkText("Logg inn")).Click();            
+            if(driver.FindElements(By.ClassName("dl-linkbutton")).Count > 0) 
+            {
+                driver.FindElements(By.ClassName("dl-linkbutton"))[0].Click();
+            }
+
             if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed) 
             {
                 IWebElement orgSelector = driver.FindElement(By.Id("org_selector-selectized"));
