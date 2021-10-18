@@ -24,7 +24,8 @@ namespace TestSuite
         {
             Console.WriteLine("OneTimeSetUp begin");
             LogWriter.LogWrite("Starter seleniumtest.");
-            driver = Selenium.SeleniumSetup.GetSeleniumDriver();
+            driver = Selenium.SeleniumSetup.GetFirefoxDriver();
+            //driver = Selenium.SeleniumSetup.GetBrowserstackDriver();
             Console.WriteLine("OneTimeSetUp finished");
         }
 
@@ -140,7 +141,7 @@ namespace TestSuite
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
                 LoggInnMedFeide(elevFeideFnr, feidePw);
 
-                driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
+                GaaTilSeleniumFag();
                 string pageSource = driver.PageSource;
 
                 Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
@@ -153,11 +154,38 @@ namespace TestSuite
                 LogWriter.LogWrite("sjekkTilgangTilFag failed.. StackTrace:");
                 LogWriter.LogWrite(e.StackTrace);
                 LoggUt();
-            } 
+            }
         }
-    
+
+        [Test]
+        [TestCase(TestName = "Test av AdobeConnect (:construction_worker: Denne testen er under arbeid... :construction:)")]
+        public void testAdobeConnect()
+        {            
+            driver.Navigate().GoToUrl("https://skole.digilaer.no");
+            LoggInnMedFeide(elevFeideFnr, feidePw);  
+            GaaTilSeleniumFag();
+
+            string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
+            driver.Navigate().GoToUrl(adobeConnectUrl);
+            Assert.True(driver.FindElement(By.XPath("//label[@for='lblmeetingnametitle']")).Displayed, "Felt for møtetittel ikke funnet");
+
+            string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
+            int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
+            moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
+            driver.Navigate().GoToUrl(moteUrl);
+
+            // TODO: Når testdata er på plass: Implementer mer test her hvis mulig (Nå gis kun "Unable to retrieve meeting details")
+            LoggUt(); // Funker logout hefra direkte når inne i AdobeConnect? 
+        }
+
         private void LoggInnMedFeide(string brukernavn, string passord)
         {
+            if(driver.PageSource.ToLower().Contains("innlogget bruker")){
+                LogWriter.LogWrite("Var allerede logget inn, forsøker å logge ut...");
+                LoggUt();
+                LogWriter.LogWrite("Logget ut ok");
+            }
+
             driver.FindElement(By.LinkText("Logg inn")).Click();            
             if(driver.FindElements(By.ClassName("dl-linkbutton")).Count > 0) 
             {
@@ -177,12 +205,17 @@ namespace TestSuite
 
             Assert.That(driver.PageSource.Contains("usermenu"), Is.True);
         }
- 
+
         private void LoggUt()
         {
             driver.FindElement(By.ClassName("usermenu")).Click();
             Thread.Sleep(1000);            
             driver.FindElement(By.XPath("//span[.='Logg ut']")).Click();
+        }
+
+        private void GaaTilSeleniumFag()
+        {
+            driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
         }
     }
 }
