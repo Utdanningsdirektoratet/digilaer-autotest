@@ -107,11 +107,17 @@ namespace TestSuite
         [TestCase(TestName = "Logg inn med Feide via digilaer.no")]
         public void logInAndOutDigilaerWithFeide()
         {
-            driver.Navigate().GoToUrl("https://digilaer.no");
+            try
+            {
+                driver.Navigate().GoToUrl("https://digilaer.no");
 
-            LoggInnMedFeide(elevFeideFnr, feidePw);
+                LoggInnMedFeide(elevFeideFnr, feidePw);
 
-            LoggUt();
+                LoggUt();
+            } catch(Exception exception)
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
         }
 
         [Test]
@@ -123,12 +129,9 @@ namespace TestSuite
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
                 LoggInnMedFeide(elevFeideFnr, feidePw);  
                 LoggUt();
-            } catch (Exception e)
+            } catch (Exception exception)
             {
-                Printscreen.TakeScreenShot(driver, "innUtSkoleDig");
-                LogWriter.LogWrite("logInAndOutSkoleDigilaerWithFeide failed.. StackTrace:");
-                LogWriter.LogWrite(e.StackTrace);
-                LoggUt();
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         } 
     
@@ -148,12 +151,9 @@ namespace TestSuite
                 Assert.That(pageSource.ToLower().Contains("emne 4"), Is.True);
 
                 LoggUt();
-            } catch (Exception e) 
+            } catch (Exception exception) 
             {
-                Printscreen.TakeScreenShot(driver, "sjekkFagtilgang");
-                LogWriter.LogWrite("sjekkTilgangTilFag failed.. StackTrace:");
-                LogWriter.LogWrite(e.StackTrace);
-                LoggUt();
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
@@ -161,21 +161,27 @@ namespace TestSuite
         [TestCase(TestName = "Test av AdobeConnect (:construction_worker: Denne testen er under arbeid... :construction:)")]
         public void testAdobeConnect()
         {            
-            driver.Navigate().GoToUrl("https://skole.digilaer.no");
-            LoggInnMedFeide(elevFeideFnr, feidePw);  
-            GaaTilSeleniumFag();
+            try
+            {
+                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                LoggInnMedFeide(elevFeideFnr, feidePw);  
+                GaaTilSeleniumFag();
 
-            string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
-            driver.Navigate().GoToUrl(adobeConnectUrl);
-            Assert.True(driver.FindElement(By.XPath("//label[@for='lblmeetingnametitle']")).Displayed, "Felt for møtetittel ikke funnet");
+                string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
+                driver.Navigate().GoToUrl(adobeConnectUrl);
+                Assert.True(driver.FindElement(By.XPath("//label[@for='lblmeetingnametitle']")).Displayed, "Felt for møtetittel ikke funnet");
 
-            string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
-            int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
-            moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
-            driver.Navigate().GoToUrl(moteUrl);
+                string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
+                int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
+                moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
+                driver.Navigate().GoToUrl(moteUrl);
 
-            // TODO: Når testdata er på plass: Implementer mer test her hvis mulig (Nå gis kun "Unable to retrieve meeting details")
-            LoggUt(); // Funker logout hefra direkte når inne i AdobeConnect? 
+                // TODO: Når testdata er på plass: Implementer mer test her hvis mulig (Nå gis kun "Unable to retrieve meeting details")
+                LoggUt(); // Funker logout hefra direkte når inne i AdobeConnect? 
+            } catch(Exception exception)
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
         }
 
         private void LoggInnMedFeide(string brukernavn, string passord)
@@ -216,6 +222,14 @@ namespace TestSuite
         private void GaaTilSeleniumFag()
         {
             driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
+        }
+
+
+        private void haandterFeiletTest(Exception e, string testnavn)
+        {
+                Printscreen.TakeScreenShot(driver, testnavn);
+                LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
+                LoggUt();
         }
     }
 }
