@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
@@ -14,7 +15,10 @@ namespace TestSuite
 
         private IWebDriver driver;
         private string fagkodeSelenium = "SEL";
-        private string elevFeideFnr = "fra properties";
+        private string facultyEmployeeLaererFnr = "fra properties";
+        // private string tittelTBD = "fra properties"; // TODO JB: Dobbeltsjekk rolle: Trengs student over 18 eller en lærer til?
+        private string studentUnder18Fnr = "fra properties";
+
         private string feidePw = "fra properties";
         
         private string resultatTekst = "";
@@ -24,8 +28,8 @@ namespace TestSuite
         {
             Console.WriteLine("OneTimeSetUp begin");
             LogWriter.LogWrite("Starter seleniumtest.");
-            driver = Selenium.SeleniumSetup.GetFirefoxDriver();
-            //driver = Selenium.SeleniumSetup.GetBrowserstackDriver();
+           driver = Selenium.SeleniumSetup.GetFirefoxDriver();
+           // driver = Selenium.SeleniumSetup.GetBrowserstackDriver();
             Console.WriteLine("OneTimeSetUp finished");
         }
 
@@ -72,46 +76,73 @@ namespace TestSuite
 
         [Test]
         [TestCase(TestName = "Åpne digilær hovedside")]
-        public void goToDigiLaerFrontPage()
+        public void gaaTilDigilaerForside()
         {
-          driver.Navigate().GoToUrl("https://digilaer.no");  
-            Assert.That(driver.PageSource.ToLower().Contains("nasjonal"));
+            try
+            {
+                driver.Navigate().GoToUrl("https://digilaer.no");  
+
+                ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.ClassName("page__content"));
+                Assert.That(sideelementer.Count, Is.GreaterThan(0));
+                
+                sideelementer = driver.FindElements(By.ClassName("layout"));
+                Assert.That(sideelementer.Count, Is.GreaterThan(0));
+            } catch(Exception exception)
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
         }
 
         [Test]
-        [TestCase(TestName = "Test at målform kan endres")]
+        [TestCase(TestName = "Målform kan endres")]
         public void testAtMaalFormKanEndres()
-        {
-            driver.Navigate().GoToUrl("https://digilaer.no");
-
-            driver.FindElement(By.Id("language-switcher")).Click();
-            driver.FindElement(By.LinkText("Nynorsk")).Click();
-            Assert.That(driver.PageSource.ToLower().Contains("moglegheiter"), Is.True);
-
-            driver.FindElement(By.Id("language-switcher")).Click();
-            driver.FindElement(By.LinkText("Bokmål")).Click();
-            Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
-            
-            driver.Navigate().GoToUrl("https://digilaer.no/nb/om-digilaerno");
-        }
-
-        [Test]
-        [TestCase(TestName = "Åpne skole.digilær hovedside")]
-        public void goToSkoleDigiLaerFrontPage()
-        {    
-            driver.Navigate().GoToUrl("https://skole.digilaer.no");
-            Assert.That(driver.PageSource.ToLower().Contains("velkommen"), Is.True);
-        } 
-
-        [Test]
-        [TestCase(TestName = "Logg inn med Feide via digilaer.no")]
-        public void logInAndOutDigilaerWithFeide()
         {
             try
             {
                 driver.Navigate().GoToUrl("https://digilaer.no");
 
-                LoggInnMedFeide(elevFeideFnr, feidePw);
+                driver.FindElement(By.Id("language-switcher")).Click();
+                driver.FindElement(By.LinkText("Nynorsk")).Click();
+                Assert.That(driver.PageSource.ToLower().Contains("moglegheiter"), Is.True);
+
+                driver.FindElement(By.Id("language-switcher")).Click();
+                driver.FindElement(By.LinkText("Bokmål")).Click();
+                Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
+                
+                driver.Navigate().GoToUrl("https://digilaer.no/nb/om-digilaerno");
+            } catch(Exception exception)
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+        }
+
+        [Test]
+        [TestCase(TestName = "Åpne skole.digilær hovedside")]
+        public void gaaTilSkoleDigiLaerForside()
+        {
+            try
+            {
+                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.Id("page"));
+                Assert.That(sideelementer.Count, Is.GreaterThan(0));
+                
+                sideelementer = driver.FindElements(By.ClassName("card-body"));
+                Assert.That(sideelementer.Count, Is.GreaterThan(0));
+            } catch(Exception exception)
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+        }
+
+        [Test]
+        [TestCase(TestName = "Elev kan logge på med Feide via digilaer.no")]
+        public void loggInnOgUtAvDigilaerMedFeide()
+        {
+            try
+            {
+                driver.Navigate().GoToUrl("https://digilaer.no");
+
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 LoggUt();
             } catch(Exception exception)
@@ -121,28 +152,43 @@ namespace TestSuite
         }
 
         [Test]
-        [TestCase(TestName = "Logg inn og ut av skole.digilær med Feide")]
-        public void logInAndOutSkoleDigilaerWithFeide()
+        [TestCase(TestName = "Elev kan logge på med Feide via skole.digilær")]
+        public void loggInnOgUtAvSkoleDigilaerMedFeide()
         {
             try
 			{
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                LoggInnMedFeide(elevFeideFnr, feidePw);  
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);  
                 LoggUt();
             } catch (Exception exception)
             {
                 haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
-        } 
+        }
+
+         [Test]
+        [TestCase(TestName = "Lærer kan logge på med Feide")]
+        public void loggInnOgUSomLaererMedFeide()
+        {
+            try
+			{
+                driver.Navigate().GoToUrl("https://digilaer.no");
+                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);  
+                LoggUt();
+            } catch (Exception exception)
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+        }
     
         [Test]
-        [TestCase(TestName = "Sjekk tilgang til fag")]
-        public void sjekkTilgangTilFag()
+        [TestCase(TestName = "Elev har tilgang til fag")]
+        public void sjekkAtElevHarTilgangTilFag()
         {
             try
             {
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                LoggInnMedFeide(elevFeideFnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 GaaTilSeleniumFag();
                 string pageSource = driver.PageSource;
@@ -158,13 +204,34 @@ namespace TestSuite
         }
 
         [Test]
-        [TestCase(TestName = "Test av AdobeConnect (:construction_worker: Denne testen er under arbeid... :construction:)")]
+        [TestCase(TestName = "Elev kan ikke redigere fag")]
+        public void sjekkAtElevIkkeKanRedigereFag()
+        {
+            try
+            {
+                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+
+                GaaTilSeleniumFag();
+
+                ReadOnlyCollection<IWebElement> redigeringsknapp = driver.FindElements(By.XPath("//button[.='Slå redigering på']"));
+                Assert.That(redigeringsknapp.Count, Is.Zero);
+  
+                LoggUt();
+            } catch (Exception exception) 
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+        }
+
+        [Test]
+        [TestCase(TestName = "AdobeConnect (:construction_worker: Denne testen er under arbeid... :construction:)")]
         public void testAdobeConnect()
         {            
             try
             {
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                LoggInnMedFeide(elevFeideFnr, feidePw);  
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);  
                 GaaTilSeleniumFag();
 
                 string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
@@ -184,9 +251,36 @@ namespace TestSuite
             }
         }
 
+        [Test]
+        [TestCase(TestName = "Lærer kan redigere fag")]
+        public void testAtLaererKanRedigereFag()
+        {            
+            try
+            {
+                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);  
+                GaaTilSeleniumFag();
+
+                driver.FindElement(By.XPath("//button[.='Slå redigering på']")).Click();
+
+                ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//a[@aria-label='Rediger']"));
+                Assert.That(redigerknapper.Count, Is.GreaterThan(6));
+                //vurder å faktisk redigere noe.. obs: hvis flere tråder kjører i parallell kan dette bli krøll
+
+                // slå redigering av 
+                driver.FindElement(By.XPath("//button[.='Slå redigering av']")).Click();
+
+                LoggUt(); 
+            } catch(Exception exception)
+            {
+                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+        }
+
         private void LoggInnMedFeide(string brukernavn, string passord)
         {
-            if(driver.PageSource.ToLower().Contains("innlogget bruker")){
+            if(driver.PageSource.ToLower().Contains("innlogget bruker"))
+            {
                 LogWriter.LogWrite("Var allerede logget inn, forsøker å logge ut...");
                 LoggUt();
                 LogWriter.LogWrite("Logget ut ok");
@@ -209,7 +303,8 @@ namespace TestSuite
             driver.FindElement(By.Id("password")).SendKeys(passord);
             driver.FindElement(By.Id("password")).SendKeys(Keys.Enter);
 
-            Assert.That(driver.PageSource.Contains("usermenu"), Is.True);
+            Thread.Sleep(2000);
+            Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
         }
 
         private void LoggUt()
@@ -223,7 +318,6 @@ namespace TestSuite
         {
             driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
         }
-
 
         private void haandterFeiletTest(Exception e, string testnavn)
         {

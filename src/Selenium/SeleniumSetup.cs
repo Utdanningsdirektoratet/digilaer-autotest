@@ -20,6 +20,8 @@ namespace Selenium
 
         public static IWebDriver GetBrowserstackDriver()
         {  
+//          os_version, resolution, browser, browser_version, os, (name benytter noe av dette), 
+
             OpenQA.Selenium.Firefox.FirefoxOptions capability = new OpenQA.Selenium.Firefox.FirefoxOptions();
             // Hardkodet foreløpig:
             capability.AddAdditionalCapability("os_version", "10", true);
@@ -32,8 +34,8 @@ namespace Selenium
             capability.AddAdditionalCapability("browserstack.debug", true);
             capability.AddAdditionalCapability("browserstack.user", BrowserStackUsername, true);
             capability.AddAdditionalCapability("browserstack.key", BrowserStackKey, true);
- //           ChromeOptions options = new ChromeOptions(); //Execute Selenium Chrome WebDriver in silent mode
- //           options.AddArgument("--log-level=3");
+//          ChromeOptions options = new ChromeOptions(); //Execute Selenium Chrome WebDriver in silent mode
+//          options.AddArgument("--log-level=3");
 
             IWebDriver driver = new RemoteWebDriver(new Uri("http://hub-cloud.browserstack.com/wd/hub"), capability);
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10); //Implicit wait for 10 seconds
