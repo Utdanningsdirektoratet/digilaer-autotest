@@ -1,8 +1,8 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading;
-using api.monitor.db;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using monitor.api;
+using monitor.api.dto;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
@@ -13,29 +13,32 @@ using Utils;
 
 namespace TestSuite
 {
-    //  [Parallelizable(ParallelScope.Fixtures)] // Gjør ingen forskjell i browserstack virker som.. 
+//  [Parallelizable(ParallelScope.Fixtures)] // Har et maks antall, trolig 5 stk samtidige. Dersom dette skal benyttes: Sørg for at det er trådsikkert mtp skriving til DB-api
     [TestFixture(DeviceConfig.OSXBigSurEdge)]
-    [TestFixture(DeviceConfig.Win10Firefox)]
     [TestFixture(DeviceConfig.OSXBigSurChrome)]
-    [TestFixture(DeviceConfig.Win10Edge)]
     [TestFixture(DeviceConfig.OSXBigSurFirefox)]
     [TestFixture(DeviceConfig.OSXBigSurSafari)]
-    [TestFixture(DeviceConfig.Ipad11Pro2020)]
-    [TestFixture(DeviceConfig.AndroidGalaxyS20)]
-    [TestFixture(DeviceConfig.AndroidGalaxyTabS7)] 
     [TestFixture(DeviceConfig.IOSIphoneXS)]
     [TestFixture(DeviceConfig.Win10Chrome)]
+    [TestFixture(DeviceConfig.Win10Firefox)]
+    [TestFixture(DeviceConfig.Win10Edge)]
+    [TestFixture(DeviceConfig.AndroidGalaxyS20)]
+    [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
+    [TestFixture(DeviceConfig.Ipad11Pro2020)]
     public class LoginTests
     {
         private IWebDriver driver;
         private BrowserStackCapabilities bsCaps;
         private string fagkodeSelenium = "SEL";
         private string facultyEmployeeLaererFnr = "fra properties";
-        // private string tittelTBD = "fra properties"; // TODO JB: Dobbeltsjekk rolle: Trengs student over 18 eller en lærer til?
+        // private string tittelTBD = "fra properties"; // TODO: Dobbeltsjekk rolle: Trengs student over 18 eller en lærer til?
         private string studentUnder18Fnr = "fra properties";
         private string feidePw = "fra properties";
-        
         private string resultatTekst = "";
+        private int enhetIdForDB;
+        private int funkTestIdForDB;
+        private DateTime teststartForDB;
+        private DateTime testsluttForDB;
 
         public LoginTests(DeviceConfig deviceConfig)
         {
@@ -77,38 +80,48 @@ namespace TestSuite
                 bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S20", osVersion = "10.0", realMobile = "true", local = "false"};
             }
 
-            driver = seleniumSetup.GetBrowserstackDriver(bsCaps);
+            // driver = seleniumSetup.GetFirefoxDriver(); // For lokal testing evt
+             driver = seleniumSetup.GetBrowserstackDriver(bsCaps);
         }
 
         [OneTimeSetUp]
         public void Init()
         {
-            LogWriter.LogWrite("Starter seleniumtest.");
-            maksimerVindu();
+            LogWriter.LogWrite("Starter seleniumtest på en device.");
+            enhetIdForDB =  MonitorApiClient.FindOrCreateEnhetOppsett(new EnhetOppsett{
+                enhet = bsCaps.device, nettleserNavn = bsCaps.browser, nettleserVersjon = bsCaps.browserVersion,
+                osNavn = bsCaps.os, osVersjon = bsCaps.osVersion, opplosning = bsCaps.resolution
+            });
+            Console.WriteLine("Id mottatt er :  " + enhetIdForDB);
+            MaksimerVindu();
+        }
+
+        [SetUp]
+        public void BeforeEachTest()
+        {
+            teststartForDB = DateTime.Now;
         }
 
         [OneTimeTearDown]
         public void AfterTestsOnOneDeviceIsFinished()
-        { 
-            
+        {
             sendSlackResultat();
-            // TODO: Send til API  
             driver.Quit();
             LogWriter.LogWrite("Test ferdig.");
         }
 
-        private void sendSlackResultat() 
-        { 
+        private void sendSlackResultat()
+        {
             string oppsettTekst = ":gear:" + SeleniumSetup.GetNameString(bsCaps);
-            
+
             if (TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed)
             {
                 resultatTekst = oppsettTekst + ":\n"
-                + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n" 
+                + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n"
                 + resultatTekst
                 + "\n Kanskje <@joakimbjerkheim> tar en titt?";
                 ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");
-            } else 
+            } else
             {
                 resultatTekst = oppsettTekst + ":\n"
                 + "Alle " + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
@@ -120,13 +133,20 @@ namespace TestSuite
         }
 
         [TearDown]
-        public void AfterEachTest() 
+        public void AfterEachTest()
         {
+            funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
+
+             MonitorApiClient.PostTestkjoring(new Testkjoring{
+                enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
+                starttid = teststartForDB, sluttid = DateTime.Now,
+                debugInformasjon = TestContext.CurrentContext.Result.Message + TestContext.CurrentContext.Result.StackTrace});
+
             if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed))
             {
                 resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n";
             }
-            else if (TestContext.CurrentContext.Result.Outcome.Equals(TestStatus.Failed) ||  
+            else if (TestContext.CurrentContext.Result.Outcome.Equals(TestStatus.Failed) ||
             TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) || TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
             {
                 resultatTekst += ":x:" + TestContext.CurrentContext.Test.Name + "\n";
@@ -135,25 +155,25 @@ namespace TestSuite
 
         [Test]
         [TestCase(TestName = "Åpne digilær hovedside")]
-        public void gaaTilDigilaerForside()
+        public void GaaTilDigilaerForside()
         {
             try
             {
-                driver.Navigate().GoToUrl("https://digilaer.no");  
+                driver.Navigate().GoToUrl("https://digilaer.no");
                 ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.ClassName("page__content"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
-                
+
                 sideelementer = driver.FindElements(By.ClassName("layout"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
             } catch(Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
         [Test]
         [TestCase(TestName = "Målform kan endres")]
-        public void testAtMaalFormKanEndres()
+        public void TestAtMaalFormKanEndres()
         {
             try
             {
@@ -162,9 +182,9 @@ namespace TestSuite
                 {
                     driver.FindElement(By.Id("language-switcher")).Click();
                 }
-                
+
                 driver.FindElement(By.LinkText("Nynorsk")).Click();
-                haandterMacSafari();
+                HaandterMacSafari();
                 Assert.That(driver.PageSource.ToLower().Contains("moglegheiter"), Is.True);
 
                 if(driver.FindElement(By.Id("language-switcher")).Displayed)
@@ -174,17 +194,17 @@ namespace TestSuite
 
                 driver.FindElement(By.LinkText("Bokmål")).Click();
                 Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
-                
+
                 driver.Navigate().GoToUrl("https://digilaer.no/nb/om-digilaerno");
             } catch(Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
         [Test]
         [TestCase(TestName = "Åpne skole.digilær hovedside")]
-        public void gaaTilSkoleDigiLaerForside()
+        public void GaaTilSkoleDigiLaerForside()
         {
             try
             {
@@ -192,18 +212,18 @@ namespace TestSuite
 
                 ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.Id("page"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
-                
+
                 sideelementer = driver.FindElements(By.ClassName("card-body"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
             } catch(Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
  
         [Test]
         [TestCase(TestName = "Elev kan logge på med Feide via digilaer.no")]
-        public void loggInnOgUtAvDigilaerMedFeide()
+        public void LoggInnOgUtAvDigilaerMedFeide()
         {
             try
             {
@@ -213,44 +233,44 @@ namespace TestSuite
                 LoggUt();
             } catch(Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
         [Test]
         [TestCase(TestName = "Elev kan logge på med Feide via skole.digilær")]
-        public void loggInnOgUtAvSkoleDigilaerMedFeide()
+        public void LoggInnOgUtAvSkoleDigilaerMedFeide()
         {
             try
 			{
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                haandterMacSafari();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);  
+                HaandterMacSafari();
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 LoggUt();
             } catch (Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
-        } 
+        }
 
-         [Test]
+        [Test]
         [TestCase(TestName = "Lærer kan logge på med Feide")]
-        public void loggInnOgUSomLaererMedFeide()
+        public void LoggInnOgUSomLaererMedFeide()
         {
             try
 			{
                 driver.Navigate().GoToUrl("https://digilaer.no");
-                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);  
+                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
                 LoggUt();
             } catch (Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
-        } 
-    
+        }
+
         [Test]
         [TestCase(TestName = "Elev har tilgang til fag")]
-        public void sjekkAtElevHarTilgangTilFag()
+        public void SjekkAtElevHarTilgangTilFag()
         {
             try
             {
@@ -263,15 +283,15 @@ namespace TestSuite
                 Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
 
                 LoggUt();
-            } catch (Exception exception) 
+            } catch (Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
-       [Test]
+        [Test]
         [TestCase(TestName = "Elev kan ikke redigere fag")]
-        public void sjekkAtElevIkkeKanRedigereFag()
+        public void SjekkAtElevIkkeKanRedigereFag()
         {
             try
             {
@@ -284,26 +304,26 @@ namespace TestSuite
                 Assert.That(redigeringsknapp.Count, Is.Zero);
   
                 LoggUt();
-            } catch (Exception exception) 
+            } catch (Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
         [Test]
         [TestCase(TestName = "Last AdobeConnect-side")]
-        public void testAdobeConnect()
-        {            
+        public void TestAdobeConnect()
+        {
             try
             {
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);  
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 GaaTilSeleniumFag();
 
                 string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
                 driver.Navigate().GoToUrl(adobeConnectUrl);
                 Assert.True(driver.FindElement(By.XPath("//label[@for='lblmeetingnametitle']")).Displayed, "Felt for møtetittel ikke funnet");
-                // TODO JB: Det er trolig flere popups...
+
                 string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
                 int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
                 moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
@@ -313,27 +333,39 @@ namespace TestSuite
                 LoggUt();
             } catch(Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
-        } 
+        }
 
-     [Test]
+        [Test]
         [TestCase(TestName = "Last Zoom-side")]
-        public void testZoom()
-        {            
+        public void TestZoom()
+        {
             try
             {
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);  
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 GaaTilSeleniumFag();
 
-                driver.FindElement(By.XPath("//span[contains(text(), 'SELENIUM test av Zoom')]")).Click();       
-                
-                Thread.Sleep(5000); // spinner i zoom...
-                if(driver.Url.Contains("https://skole.digilaer.no"))
+                driver.FindElement(By.XPath("//span[contains(text(), 'SELENIUM test av Zoom')]")).Click();
+
+                Thread.Sleep(5000); // Load spinner i zoom...
+
+                if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
                 {
                     IWebElement iFrameZoom = driver.FindElement(By.Id("contentframe"));
-                    
+
+                    Assert.IsTrue(iFrameZoom.Displayed);
+
+                    // driver.SwitchTo().Frame(iFrameZoom); // Fungerer ikke på automatisert iPad
+
+                    Thread.Sleep(5000); // spinner i zoom...
+
+                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed); // TODO: Forsøk å teste noe mer rundt zoom... denne treffer trolig kun toppen av html...
+                } else if(driver.Url.Contains("https://skole.digilaer.no"))
+                {
+                    IWebElement iFrameZoom = driver.FindElement(By.Id("contentframe"));
+
                     Assert.IsTrue(iFrameZoom.Displayed);
 
                     driver.SwitchTo().Frame(iFrameZoom);
@@ -343,122 +375,120 @@ namespace TestSuite
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
                     // TODO: Test evt noe mer her:
                     // Assert.IsTrue(driver.FindElement(By.Id("@integration-meeting-list")).Displayed);
-                    //Assert.True(driver.FindElement(By.XPath("//label[@for='lblmeetingnametitle']")).Displayed, "Felt for møtetittel ikke funnet");
                     // Assert.Greater(driver.FindElements(By.XPath("//a[text(), 'Join']")).Count, 0, "Forventet at det skulle være minst 1 Join-knapp");
 
                     driver.SwitchTo().ParentFrame();
-
-                } else { // Mobil device har selve zoom lastet i stedet for en iFrame
+                } else
+                { // Mobil device har selve zoom lastet i stedet for en iFrame
                     Thread.Sleep(5000); // spinner i Zoom
-
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
                 }
-
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                haandterMacSafari();
+                HaandterMacSafari();
                 LoggUt();
             } catch(Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
         [Test]
         [TestCase(TestName = "Lærer kan redigere fag")]
-        public void testAtLaererKanRedigereFag()
-        {            
+        public void TestAtLaererKanRedigereFag()
+        {
             try
             {
                 driver.Navigate().GoToUrl("https://skole.digilaer.no");
-                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);  
+                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
                 GaaTilSeleniumFag();
 
                 driver.FindElement(By.XPath("//button[.='Slå redigering på']")).Click();
-                haandterMacSafari();
+                HaandterMacSafari();
                 ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//a[@aria-label='Rediger']"));
                 Assert.That(redigerknapper.Count, Is.GreaterThan(6));
 
                 driver.FindElement(By.XPath("//button[.='Slå redigering av']")).Click();
 
-                LoggUt(); 
+                LoggUt();
             } catch(Exception exception)
             {
-                haandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
         private void LoggInnMedFeide(string brukernavn, string passord)
         {
-            haandterMacSafari(); 
+            HaandterMacSafari();
             if(driver.PageSource.ToLower().Contains("innlogget bruker"))
             {
                 LogWriter.LogWrite("Var allerede logget inn, forsøker å logge ut...");
                 LoggUt();
                 LogWriter.LogWrite("Logget ut ok");
             }
-            haandterMacSafari();
-            driver.FindElement(By.LinkText("Logg inn")).Click();            
-           
-            haandterMacSafari();
+            HaandterMacSafari();
+            driver.FindElement(By.LinkText("Logg inn")).Click();
 
-            if(driver.FindElements(By.ClassName("dl-linkbutton")).Count > 0) 
-            {
-                driver.FindElements(By.ClassName("dl-linkbutton"))[0].Click(); // Flere login-knapper: Klikker den første for å komme videre.. 
+            HaandterMacSafari();
+
+            if(driver.FindElements(By.ClassName("dl-linkbutton")).Count > 0)
+            { // Flere login-knapper: Klikker den første for å komme videre
+                driver.FindElements(By.ClassName("dl-linkbutton"))[0].Click();
             }
-         s   
-            haandterMacSafari();
-            if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed) 
+
+            HaandterMacSafari();
+            Thread.Sleep(2000);
+            if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
             {
                 IWebElement orgSelector = driver.FindElement(By.Id("org_selector-selectized"));
                 orgSelector.SendKeys("Feide"); // For testing mot dataporten bruk "Tjenesteleverandør"
                 orgSelector.SendKeys(Keys.Enter);
             }
 
-            haandterMacSafari();
+            HaandterMacSafari();
             driver.FindElement(By.Id("username")).SendKeys(brukernavn);
             driver.FindElement(By.Id("password")).SendKeys(passord);
 
-            // driver.FindElement(By.Id("password")).SendKeys(Keys.Enter); //  forsøker å bytte sendkeys ENTER med klikk på button submt...
-             driver.FindElement(By.XPath("//button[@type='submit']")).Click();
+            driver.FindElement(By.XPath("//button[@type='submit']")).Click();
 
-            haandterMacSafari();
+            HaandterMacSafari();
             driver.Navigate().GoToUrl("https://skole.digilaer.no/my/index.php?lang=nb");
             
-            haandterMacSafari();
+            HaandterMacSafari();
             Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
         }
 
         private void LoggUt()
         {
-            haandterMacSafari(); 
+            HaandterMacSafari();
             try
             {
                 driver.FindElement(By.ClassName("avatars")).Click();
-            } catch(Exception e) {
+            } catch(Exception e)
+            {
                 driver.FindElement(By.ClassName("usermenu")).Click();
             }
 
-            haandterMacSafari();
+            HaandterMacSafari();
             driver.FindElement(By.XPath("//span[.='Logg ut']")).Click();
-            haandterMacSafari(); 
+            HaandterMacSafari();
         }
 
         private void GaaTilSeleniumFag()
         {
-            haandterMacSafari();
+            HaandterMacSafari();
 
             IWebElement hamburgerButton = driver.FindElement(By.XPath("//button[@data-action='toggle-drawer']"));
 
-            if(hamburgerButton.GetAttribute("aria-expanded").Equals("false")) // is closed aria-expanded="false"
-            { 
+            if(hamburgerButton.GetAttribute("aria-expanded").Equals("false"))
+            {
                 hamburgerButton.Click();
             }
-            
+
             driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
-            haandterMacSafari();
+            HaandterMacSafari();
         }
 
-        private void maksimerVindu()
+        private void MaksimerVindu()
         {
             if(bsCaps.os != null && (bsCaps.os.Equals("Windows") || bsCaps.os.Equals("OS X")))
             {
@@ -466,23 +496,24 @@ namespace TestSuite
             }
         }
 
-        private void haandterMacSafari()
+        private void HaandterMacSafari()
         {
             // Safari webdriver mac os respekterer ikke webdriver wait (!?)
-            // https://developer.apple.com/forums/thread/106693 
-            // TODO: Vurder behov for denne metoden
+            // https://developer.apple.com/forums/thread/106693
+            // TODO: Vurder behov for denne metoden, eller se etter bedre fiks
 
-            if((bsCaps.browser != null && bsCaps.browser.Equals("Safari") && 
-                bsCaps.os != null && bsCaps.os.Equals("OS X")) 
+            if((bsCaps.browser != null && bsCaps.browser.Equals("Safari") &&
+                bsCaps.os != null && bsCaps.os.Equals("OS X"))
                 || (bsCaps.browser != null && bsCaps.browser.Equals("Firefox"))
                 || (bsCaps.browser != null && bsCaps.browser.Equals("iPhone"))
+                || (bsCaps.device != null && bsCaps.device.Contains("iPad"))
                 )
             {
                 Thread.Sleep(3000);
             }
         }
 
-        private void haandterFeiletTest(Exception e, string testnavn)
+        private void HaandterFeiletTest(Exception e, string testnavn)
         {
                 Printscreen.TakeScreenShot(driver, testnavn);
                 LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);

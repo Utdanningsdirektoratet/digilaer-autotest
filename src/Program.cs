@@ -1,5 +1,4 @@
 ﻿using System;
-using OpenQA.Selenium;
 using NUnitLite;
 
 namespace digilaer_autotest
