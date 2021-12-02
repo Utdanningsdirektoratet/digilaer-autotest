@@ -1,0 +1,46 @@
+CREATE TABLE dbo.Resultat
+(
+    Id int NOT NULL PRIMARY KEY,
+    Navn varchar(12) NOT NULL
+);
+
+-- NUNIT mappinger: 
+INSERT INTO dbo.Resultat (Id, Navn)
+VALUES 
+(0, 'Uavklart'),
+(1, 'Skippet'),
+(2, 'OK'),
+(3, 'Advarsel'),
+(4, 'Feilet');
+
+
+CREATE TABLE dbo.FunksjonellTest
+(
+    Id int NOT NULL IDENTITY(1, 1) PRIMARY KEY,
+    TestMetodeNavn varchar(50) NOT NULL,
+    FunksjoneltNavn varchar(50) NOT NULL,
+    ErAktiv bit NOT NULL
+);
+
+CREATE TABLE dbo.Enhet
+(
+    Id int NOT NULL IDENTITY(1, 1) PRIMARY KEY,
+    Enhet varchar(25),
+    NettleserNavn varchar(25),
+    NettleserVersjon varchar(25),
+    OsNavn varchar(25),
+    OsVersjon varchar(25),
+    Opplosning varchar(25),
+    ErAktiv bit NOT NULL
+);
+
+CREATE TABLE dbo.Testkjoring
+(
+    Id int NOT NULL IDENTITY(1, 1) PRIMARY KEY,
+    FunksjonellTest_Id int NOT NULL,
+    Enhet_Id  int NOT NULL,
+    Resultat_Id int NOT NULL,
+    Starttid datetime NOT NULL,
+    Sluttid datetime NOT NULL,
+    DebugInformasjon varchar(1500)
+);
