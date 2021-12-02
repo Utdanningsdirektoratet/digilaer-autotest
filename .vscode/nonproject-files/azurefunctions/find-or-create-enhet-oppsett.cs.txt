@@ -1,0 +1,87 @@
+#r "Newtonsoft.Json"
+
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using System.Data.SqlClient;
+
+public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
+{
+    log.LogInformation("C# HTTP trigger function til find-or-create-enhet-oppsett ");
+    var str = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_digiliaermonitorapiafcs");
+    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+    dynamic data = JsonConvert.DeserializeObject(requestBody);
+    log.LogInformation("Request body: "  + requestBody);
+
+    int enhetId = -1;
+    string enhet = data?.enhet;
+    string nettleserNavn = data?.nettleserNavn;
+    string nettleserVersjon = data?.nettleserVersjon;
+    string osNavn = data?.osNavn;
+    string osVersjon = data?.osVersjon;
+    string opplosning = data?.opplosning;
+    string erAktiv = "1";
+
+    try
+    {
+        log.LogInformation("Forsøker å hente id for eksisterende device");
+        using (SqlConnection connection = new SqlConnection(str))
+        {
+            connection.Open();
+
+            var querySelectEnhet = @"SELECT * FROM dbo.Enhet WHERE "
+            + " Enhet = '" + enhet
+            + "' AND NettleserNavn = '" + nettleserNavn
+            + "' AND NettleserVersjon = '" + nettleserVersjon
+            + "' AND OsNavn = '" + osNavn
+            + "' AND OsVersjon = '" + osVersjon
+            + "' AND Opplosning = '" + opplosning
+            + "' AND erAktiv = '" + erAktiv + "';";
+
+            log.LogInformation("Sql: " + querySelectEnhet);
+
+            SqlCommand command = new SqlCommand(querySelectEnhet, connection);
+            var reader = await command.ExecuteReaderAsync();
+            while (reader.Read())
+            {
+                    enhetId = (int)reader["Id"];
+                    log.LogInformation("Id var ved uthentig : " + enhetId);
+            }
+        }
+    } catch (Exception e)
+    {
+        log.LogInformation("Feilet i forsøk på uthenting av enhet-id");
+        log.LogError(e.ToString());
+    }
+    if(enhetId < 0)
+    {
+        try
+        {
+            log.LogInformation("Enhet eksisterer ikke, forsøker å legge til enhet");
+            using (SqlConnection connection = new SqlConnection(str))
+            {
+                connection.Open();
+
+                var queryInsertEnhet = @"INSERT INTO dbo.Enhet (Enhet, NettleserNavn, NettleserVersjon, OsNavn, OsVersjon, Opplosning, erAktiv) VALUES ('"
+                + enhet + "', '" + nettleserNavn + "', '" + nettleserVersjon + "', '" + osNavn + "', '" + osVersjon + "', '" + opplosning + "', '" + erAktiv +
+                "'); SELECT MAX(ID) FROM dbo.Enhet;";
+
+                SqlCommand command = new SqlCommand(queryInsertEnhet, connection);
+                log.LogInformation("Insert sql er: " + queryInsertEnhet);
+                var reader = await command.ExecuteReaderAsync();
+                while (reader.Read())
+                {
+                    log.LogInformation("enhetId ble  : " +  reader[0]);
+                    enhetId = (int) reader[0];
+                }
+            }
+        } catch(Exception e)
+        {
+            log.LogInformation("Klarte heller ikke insert enhet... ");
+            log.LogError(e.ToString());
+             // return new NotFoundResult();
+        }
+    }
+    return new OkObjectResult(enhetId);
+}

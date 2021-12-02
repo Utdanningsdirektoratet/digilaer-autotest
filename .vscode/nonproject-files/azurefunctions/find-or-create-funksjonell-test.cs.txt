@@ -1,0 +1,80 @@
+#r "Newtonsoft.Json"
+
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using System.Data.SqlClient;
+
+public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
+{
+    log.LogInformation("C# HTTP trigger function til find-or-create-enhet-oppsett ");
+    var str = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_digiliaermonitorapiafcs");
+    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+    dynamic data = JsonConvert.DeserializeObject(requestBody);
+    log.LogInformation("Req body: "  + requestBody);
+
+    int funksjonellTestId = -1;
+    string metodenavnTest = data?.metodenavnTest;
+    string funksjoneltNavnTest = data?.funksjoneltNavnTest;
+    string erAktiv = "1";
+
+    log.LogInformation("metodenavn " + metodenavnTest);
+    log.LogInformation("metodenavn " + funksjoneltNavnTest);
+
+    try
+    {
+        log.LogInformation("Forsøker å hente id for eksisterende funksjonelltest");
+        using (SqlConnection connection = new SqlConnection(str))
+        {
+            connection.Open();
+
+            var querySelectFunkTest = @"SELECT * FROM dbo.FunksjonellTest WHERE "
+            + " TestMetodeNavn = '" + metodenavnTest
+            + "' AND erAktiv = '" + erAktiv + "';";
+
+            log.LogInformation("Sql: " + querySelectFunkTest);
+
+            SqlCommand command = new SqlCommand(querySelectFunkTest, connection);
+            var reader = await command.ExecuteReaderAsync();
+            while (reader.Read())
+            {
+                    funksjonellTestId = (int)reader["Id"];
+                    log.LogInformation("Id funktest var ved uthentig : " + funksjonellTestId);
+            }
+        }
+    } catch (Exception e)
+    {
+        log.LogInformation("Feilet i forsøk på uthenting av funksjonell-test-id");
+        log.LogError(e.ToString());
+    }
+    if(funksjonellTestId < 0)
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(str))
+            {
+                connection.Open();
+
+                var queryInsertFunkTest = @"INSERT INTO dbo.FunksjonellTest (TestMetodeNavn, FunksjoneltNavn, erAktiv) VALUES ('"
+                + metodenavnTest + "', '" + funksjoneltNavnTest + "', '" + erAktiv +
+                "'); SELECT MAX(ID) FROM dbo.FunksjonellTest;";
+
+                SqlCommand command = new SqlCommand(queryInsertFunkTest, connection);
+                log.LogInformation("Insert sql: " + queryInsertFunkTest);
+                var reader = await command.ExecuteReaderAsync();
+                while (reader.Read())
+                {
+                    log.LogInformation("FunksjonellTestId eble  : " +  reader[0]);
+                    funksjonellTestId = (int) reader[0];
+                }
+            }
+        } catch(Exception e)
+        {
+            log.LogInformation("Klarte heller ikke inserte funksjonellTest... ");
+            log.LogError(e.ToString());
+             // return new NotFoundResult();
+        }
+    }
+    return new OkObjectResult(funksjonellTestId);
+}

@@ -1,0 +1,59 @@
+#r "Newtonsoft.Json"
+
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using System.Data.SqlClient;
+
+public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
+{
+    log.LogInformation("C# HTTP trigger function til post-testkjoring");
+    var str = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_digiliaermonitorapiafcs");
+    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+    dynamic data = JsonConvert.DeserializeObject(requestBody);
+    log.LogInformation("Req body: "  + requestBody);
+
+    int testkjoringId = -1;
+    string funksjonellTestId = data?.funksjonellTestId;
+    string enhetOppsettId = data?.enhetOppsettId;
+    string resultatId = data?.resultatId;
+    string starttid = data?.starttid;
+    string sluttid = data?.sluttid;
+    string debugInformasjon = data?.debugInformasjon;
+
+    log.LogInformation("funksjonellTestId " + funksjonellTestId);
+    log.LogInformation("enhetOppsettId " + enhetOppsettId);
+    log.LogInformation("resultatId " + resultatId);
+    log.LogInformation("starttid " + starttid);
+    log.LogInformation("sluttid " + sluttid);
+    log.LogInformation("debugInformasjon " + debugInformasjon);
+
+    try
+    {
+        using (SqlConnection connection = new SqlConnection(str))
+        {
+            connection.Open();
+
+            var queryInsertTestkjoring = @"INSERT INTO dbo.Testkjoring (FunksjonellTest_Id, Enhet_Id, Resultat_Id, Starttid, Sluttid, DebugInformasjon) VALUES ('"
+            + funksjonellTestId + "', '" + enhetOppsettId + "', '" + resultatId  + "', '" + starttid + "', '" + sluttid + "', '" + debugInformasjon +
+            "'); SELECT MAX(ID) FROM dbo.Testkjoring;";
+
+            SqlCommand command = new SqlCommand(queryInsertTestkjoring, connection);
+            log.LogInformation("Insert sql: " + queryInsertTestkjoring);
+            var reader = await command.ExecuteReaderAsync();
+            while (reader.Read())
+            {
+                log.LogInformation(" testkjoringId ble  : " +  reader[0]);
+                testkjoringId = (int) reader[0];
+            }
+        }
+    } catch(Exception e)
+    {
+        log.LogInformation("Klarte ikke insert Testkjoring");
+        log.LogError(e.ToString());
+        // return new NotFoundResult();
+    }
+
+    return new OkObjectResult(testkjoringId);
+}
