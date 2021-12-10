@@ -13,6 +13,8 @@ using Utils;
 
 namespace TestSuite
 {
+//   [TestFixture(DeviceConfig.AndroidGalaxyS20)]  // Utgår egentlig pga device issues på bstack iflg support der:       
+//   [TestFixture(DeviceConfig.GooglePixel6)] // Samme som S20 har denne gitt appium/chrome error, så forsøker uten denne også
 //  [Parallelizable(ParallelScope.Fixtures)] // Har et maks antall, trolig 5 stk samtidige. Dersom dette skal benyttes: Sørg for at det er trådsikkert mtp skriving til DB-api
     [TestFixture(DeviceConfig.OSXBigSurEdge)]
     [TestFixture(DeviceConfig.OSXBigSurChrome)]
@@ -21,10 +23,13 @@ namespace TestSuite
     [TestFixture(DeviceConfig.IOSIphoneXS)]
     [TestFixture(DeviceConfig.Win10Chrome)]
     [TestFixture(DeviceConfig.Win10Firefox)]
-    [TestFixture(DeviceConfig.Win10Edge)]
-    [TestFixture(DeviceConfig.AndroidGalaxyS20)]
+    [TestFixture(DeviceConfig.Win10Edge)] 
     [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
     [TestFixture(DeviceConfig.Ipad11Pro2020)]
+    [TestFixture(DeviceConfig.AndroidGalaxyS21)]
+    [TestFixture(DeviceConfig.AndroidOnePlus9)]
+    [TestFixture(DeviceConfig.SamsungGalaxyS10)]
+    [TestFixture(DeviceConfig.GooglePixel4XL)]
     public class LoginTests
     {
         private IWebDriver driver;
@@ -67,17 +72,33 @@ namespace TestSuite
                 bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Edge", browserVersion = "latest", resolution = "1920x1080"};
             } else if(deviceConfig == DeviceConfig.Ipad11Pro2020)
             {
-                bsCaps = new BrowserStackCapabilities{device = "iPad Pro 11 2020", osVersion = "13", realMobile = "true", local = "false"};
+                bsCaps = new BrowserStackCapabilities{device = "iPad Pro 11 2020", browser = "Safari", osVersion = "13", realMobile = "true", local = "false"};
             } else if(deviceConfig == DeviceConfig.IOSIphoneXS)
             {
-                bsCaps = new BrowserStackCapabilities{device = "iPhone XS", osVersion = "15", browser = "iPhone", realMobile = "true"};
+                bsCaps = new BrowserStackCapabilities{device = "iPhone XS", browser = "Safari", osVersion = "15", realMobile = "true"};
             } else if(deviceConfig == DeviceConfig.AndroidGalaxyTabS7)
             {
-                bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy Tab S7", osVersion = "10.0", realMobile = "true", local = "false"};
+                bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy Tab S7", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
             }
              else if(deviceConfig == DeviceConfig.AndroidGalaxyS20)
             {
-                bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S20", osVersion = "10.0", realMobile = "true", local = "false"};
+                // OBS: Frarådet å bruke denne fra bstack support da den i følge dem er ustabil.
+                bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S20", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
+            } else if(deviceConfig == DeviceConfig.AndroidGalaxyS21)
+            {
+                bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S21", browser = "Chrome", osVersion = "11.0", realMobile = "true", local = "false"};
+            } else if(deviceConfig == DeviceConfig.AndroidOnePlus9)
+            {
+                bsCaps = new BrowserStackCapabilities{device = "OnePlus 9", browser = "Chrome", osVersion = "11.0", realMobile = "true", local = "false"};
+            } else if(deviceConfig == DeviceConfig.GooglePixel6)
+            {
+                bsCaps = new BrowserStackCapabilities{device = "Google Pixel 6", browser = "Chrome", osVersion = "12.0", realMobile = "true", local = "false"};
+            } else if(deviceConfig == DeviceConfig.SamsungGalaxyS10)
+            {
+                bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S10", browser = "Chrome", osVersion = "9.0", realMobile = "true", local = "false"};
+            } else if(deviceConfig == DeviceConfig.GooglePixel4XL)
+            {
+                bsCaps = new BrowserStackCapabilities{device = "Google Pixel 4 XL", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
             }
 
             // driver = seleniumSetup.GetFirefoxDriver(); // For lokal testing evt
@@ -505,7 +526,7 @@ namespace TestSuite
             if((bsCaps.browser != null && bsCaps.browser.Equals("Safari") &&
                 bsCaps.os != null && bsCaps.os.Equals("OS X"))
                 || (bsCaps.browser != null && bsCaps.browser.Equals("Firefox"))
-                || (bsCaps.browser != null && bsCaps.browser.Equals("iPhone"))
+                || (bsCaps.browser != null && bsCaps.browser.Equals("Safari") && bsCaps.device != null && bsCaps.device.Contains("iPhone"))
                 || (bsCaps.device != null && bsCaps.device.Contains("iPad"))
                 )
             {

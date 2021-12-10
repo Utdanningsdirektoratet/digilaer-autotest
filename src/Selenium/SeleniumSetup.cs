@@ -126,6 +126,12 @@ namespace Selenium
         IOSIphoneXS,
         Ipad11Pro2020,
         AndroidGalaxyS20,
-        AndroidGalaxyTabS7
+        AndroidGalaxyTabS7,
+         AndroidGalaxyS21,
+         AndroidOnePlus9,
+         GooglePixel6,
+         GooglePixel4XL,
+         SamsungGalaxyS10
+
     }
 }
