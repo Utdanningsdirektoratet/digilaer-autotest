@@ -138,9 +138,9 @@ namespace TestSuite
             if (TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed)
             {
                 resultatTekst = oppsettTekst + ":\n"
-                + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n"
+                + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + "test ok\n"
                 + resultatTekst
-                + "\n Kanskje <@joakimbjerkheim> tar en titt?";
+                + "\n Kanskje <@joakimbjerkheim> or <@mathias.meier.nilsen> tar en titt?";
                 ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");
             } else
             {
@@ -191,7 +191,7 @@ namespace TestSuite
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
-
+        /*
         [Test]
         [TestCase(TestName = "Målform kan endres")]
         public void TestAtMaalFormKanEndres()
@@ -436,7 +436,7 @@ namespace TestSuite
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
-
+*/
         private void LoggInnMedFeide(string brukernavn, string passord)
         {
             HaandterMacSafari();
