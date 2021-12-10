@@ -16,7 +16,7 @@ namespace TestSuite
 //   [TestFixture(DeviceConfig.AndroidGalaxyS20)]  // Utgår egentlig pga device issues på bstack iflg support der:       
 //   [TestFixture(DeviceConfig.GooglePixel6)] // Samme som S20 har denne gitt appium/chrome error, så forsøker uten denne også
 //  [Parallelizable(ParallelScope.Fixtures)] // Har et maks antall, trolig 5 stk samtidige. Dersom dette skal benyttes: Sørg for at det er trådsikkert mtp skriving til DB-api
-    [TestFixture(DeviceConfig.OSXBigSurEdge)]
+  /*  [TestFixture(DeviceConfig.OSXBigSurEdge)]
     [TestFixture(DeviceConfig.OSXBigSurChrome)]
     [TestFixture(DeviceConfig.OSXBigSurFirefox)]
     [TestFixture(DeviceConfig.OSXBigSurSafari)]
@@ -28,7 +28,7 @@ namespace TestSuite
     [TestFixture(DeviceConfig.Ipad11Pro2020)]
     [TestFixture(DeviceConfig.AndroidGalaxyS21)]
     [TestFixture(DeviceConfig.AndroidOnePlus9)]
-    [TestFixture(DeviceConfig.SamsungGalaxyS10)]
+    [TestFixture(DeviceConfig.SamsungGalaxyS10)]*/
     [TestFixture(DeviceConfig.GooglePixel4XL)]
     public class LoginTests
     {

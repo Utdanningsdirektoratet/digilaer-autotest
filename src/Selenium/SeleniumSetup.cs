@@ -9,8 +9,8 @@ namespace Selenium
     public class SeleniumSetup
     {
 
-        private static string BrowserStackUsername = "Hent fra properties";
-        private static string BrowserStackKey = "Hent fra properties";
+        private static string BrowserStackUsername = "testadministrato_MGXB1Y"; // Temp get from properties
+        private static string BrowserStackKey = "S3AJmtTo4Qw3nAchf8Eg"; // Temp get from properties
         private static int timeoutSekunder = 10;
         public IWebDriver GetBrowserstackDriver(BrowserStackCapabilities bsCaps)
         {
