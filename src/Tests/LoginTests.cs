@@ -140,7 +140,7 @@ namespace TestSuite
                 resultatTekst = oppsettTekst + ":\n"
                 + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n"
                 + resultatTekst
-                + "\n Kanskje <@joakimbjerkheim> tar en titt?";
+                + "\n Kanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
                 ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");
             } else
             {
