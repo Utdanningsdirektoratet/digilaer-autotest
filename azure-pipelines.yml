@@ -1,0 +1,48 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+schedules:
+- cron: "30 2 * * *" 
+  always: true
+  branches:
+    include:
+    - main
+  batch: true
+  displayName: Nattlig digilær autotest selenium
+
+pool:
+  vmImage: ubuntu-latest
+
+# steps:
+#- script: echo Hello, world!
+#  displayName: 'Run a one-line script'
+
+#- script: |
+#    echo Kjører selenium tester.
+#    echo Gjøres hver natt
+#  displayName: 'Kjører selenium tester'
+
+stages:
+- stage: run_ui_tests
+  displayName: Run UI Tests
+  jobs:
+    - job: build
+      displayName: Build and Test
+      continueOnError: false
+      steps:
+        - task: UseDotNet@2
+          displayName: 'Using dotnet 5.0.x'
+          inputs:
+            packageType: 'sdk'
+            version: '5.0.x'
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Kjør selenium tester'
+          inputs:
+            command: 'run'
+            arguments: ''
+            projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
