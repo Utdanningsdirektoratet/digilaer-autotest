@@ -41,7 +41,7 @@ namespace Selenium
             capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
             capability.AddAdditionalCapability("browserstack.seleniumLogs", "false");
             capability.AddAdditionalCapability("browserstack.appiumLogs", "false");
-            capability.AddAdditionalCapability("browserstack.video", "false");
+            capability.AddAdditionalCapability("browserstack.video", "true");
             capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
             capability.AddAdditionalCapability("browserstack.networkLogs", "false");
 
@@ -132,6 +132,5 @@ namespace Selenium
          GooglePixel6,
          GooglePixel4XL,
          SamsungGalaxyS10
-
     }
 }

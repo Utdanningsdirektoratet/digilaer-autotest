@@ -140,12 +140,12 @@ namespace TestSuite
                 resultatTekst = oppsettTekst + ":\n"
                 + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n"
                 + resultatTekst
-                + "\n Kanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
+                + "\nKanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
                 ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");
             } else
             {
                 resultatTekst = oppsettTekst + ":\n"
-                + "Alle " + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
+                + ":white_check_mark:" + "Alle " + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
                 + resultatTekst;
                 ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");
             }
@@ -165,7 +165,8 @@ namespace TestSuite
 
             if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed))
             {
-                resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n";
+                // Utkommentert for å ikke overfylle slack kanalen etter kjøring. Fokus på evt feilede tester heller.
+                // resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n"; 
             }
             else if (TestContext.CurrentContext.Result.Outcome.Equals(TestStatus.Failed) ||
             TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) || TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
@@ -214,6 +215,7 @@ namespace TestSuite
                 }
 
                 driver.FindElement(By.LinkText("Bokmål")).Click();
+                HaandterMacSafari();
                 Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
 
                 driver.Navigate().GoToUrl("https://digilaer.no/nb/om-digilaerno");
@@ -343,13 +345,48 @@ namespace TestSuite
 
                 string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
                 driver.Navigate().GoToUrl(adobeConnectUrl);
-                Assert.True(driver.FindElement(By.XPath("//label[@for='lblmeetingnametitle']")).Displayed, "Felt for møtetittel ikke funnet");
 
                 string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
                 int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
                 moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
                 driver.Navigate().GoToUrl(moteUrl);
-                // TODO: Implementer mer test her om ønskelig
+                Thread.Sleep(15000); // Lang lastetid og flere redirects
+
+                if(bsCaps.realMobile == null)
+                {
+                    IWebElement iFrameAdobe = driver.FindElement(By.Id("html-meeting-frame"));
+
+                    Assert.IsTrue(iFrameAdobe.Displayed);
+
+                    driver.SwitchTo().Frame(iFrameAdobe);
+                    String source = driver.PageSource;
+                    Assert.True(source.Contains("attendeePodContainerDiv"), "Siden inneholder ikke attendeePodContainerDiv");
+
+                    if(driver.FindElement(By.Id("download-app-notifier_1")) != null && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
+                    {
+                        driver.FindElement(By.Id("download-app-notifier_1")).Click();
+                    }
+
+                    if(driver.FindElement(By.XPath("//span[.='Close']")) != null && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
+                    {
+                        driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
+                    }
+
+                    if(driver.FindElement(By.XPath("//span[.='Display Media']")) != null && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
+                    {
+                        driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
+                    }
+
+                    Assert.True(driver.FindElement(By.Id("attendeePodContainerDiv")).Displayed, "Div for deltakere ikke funnet (attendeePodContainerDiv)");
+
+                    driver.SwitchTo().ParentFrame();
+                } else // Mobiler/tablets krever egen app. Gjør kun en assert:
+                {
+                    Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));
+                }
+                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                HaandterAlert();
+                HaandterMacSafari();
 
                 LoggUt();
             } catch(Exception exception)
@@ -528,18 +565,36 @@ namespace TestSuite
                 || (bsCaps.browser != null && bsCaps.browser.Equals("Firefox"))
                 || (bsCaps.browser != null && bsCaps.browser.Equals("Safari") && bsCaps.device != null && bsCaps.device.Contains("iPhone"))
                 || (bsCaps.device != null && bsCaps.device.Contains("iPad"))
+                || (bsCaps.device != null && bsCaps.device.Contains("S10")) // Feilet ved login ifbm adobeconnect
+                || (bsCaps.device != null && bsCaps.device.Contains("OnePlus 9")) // Feilet ifbm klikke på lenke for å gå inn på zoom
                 )
             {
                 Thread.Sleep(3000);
             }
         }
 
+        private void HaandterAlert()
+        {
+            try
+            {
+                driver.SwitchTo().Alert().Accept();
+            } catch(Exception e) 
+            {
+                // Alert not present
+            } 
+        }
+
         private void HaandterFeiletTest(Exception e, string testnavn)
         {
-                Printscreen.TakeScreenShot(driver, testnavn);
-                LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
+            Printscreen.TakeScreenShot(driver, testnavn);
+            LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
+            try {
                 LoggUt();
-                throw e;
+            } catch(Exception ex)
+            {
+                LogWriter.LogWrite("Feilet ved utlogging i håndtering av en feilet test. Var kanskje ikke innlogget?");
+            }
+            throw e;
         }
     }
 }
