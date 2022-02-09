@@ -8,9 +8,9 @@ namespace digilaer_autotest
         static int Main(string[] args)
         {
             Console.WriteLine("Digilær Autotest start");
-            Console.WriteLine("args[0] = " + args[0]);
+            Console.WriteLine("0 = " + args[0] + ", 1 = " + args[1]);
 
-            return new AutoRun().Execute(args);
+            return new AutoRun().Execute(new string[0]);
         }
     }
 }

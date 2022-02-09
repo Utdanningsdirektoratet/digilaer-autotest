@@ -44,5 +44,5 @@ stages:
           displayName: 'Kjør selenium tester'
           inputs:
             command: 'run'
-            arguments: '$(DIGI_TEST)'
+            arguments: '$(DIGI_TEST) $(DIGI_TEST)'
             projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
