@@ -35,10 +35,10 @@ namespace TestSuite
         private IWebDriver driver;
         private BrowserStackCapabilities bsCaps;
         private string fagkodeSelenium = "SEL";
-        private string facultyEmployeeLaererFnr = "fra properties";
+        private string facultyEmployeeLaererFnr = System.Environment.GetEnvironmentVariable("DIGI_USER_FACULTY");
         // private string tittelTBD = "fra properties"; // TODO: Dobbeltsjekk rolle: Trengs student over 18 eller en lærer til?
-        private string studentUnder18Fnr = "fra properties";
-        private string feidePw = "fra properties";
+        private string studentUnder18Fnr = System.Environment.GetEnvironmentVariable("DIGI_ELEV_UNDER_ATTEN");
+        private string feidePw = System.Environment.GetEnvironmentVariable("DIGI_FEIDE_PW");
         private string resultatTekst = "";
         private int enhetIdForDB;
         private int funkTestIdForDB;

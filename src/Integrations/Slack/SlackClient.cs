@@ -6,8 +6,7 @@ namespace Slack
     public class SlackClient 
     {
         private static string baseSlackUrl = "https://hooks.slack.com/";
-        private static string webhookPassword = "Get from properties";
-        private static string slackHookUrl = "services/" + webhookPassword;
+        private static string slackHookUrl = "services/" + System.Environment.GetEnvironmentVariable("DIGI_SLACK_WEBHOOK_PW");
         private static string slackChannel = "#autotest_digilær";
 
         private static string slackUserName = "Digilær Autotest";

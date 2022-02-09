@@ -9,8 +9,8 @@ namespace Selenium
     public class SeleniumSetup
     {
 
-        private static string BrowserStackUsername = "Hent fra properties";
-        private static string BrowserStackKey = "Hent fra properties";
+        private static string BrowserStackUsername = System.Environment.GetEnvironmentVariable("DIGI_BS_USER");
+        private static string BrowserStackKey = System.Environment.GetEnvironmentVariable("DIGI_BS_KEY");
         private static int timeoutSekunder = 10;
         public IWebDriver GetBrowserstackDriver(BrowserStackCapabilities bsCaps)
         {

@@ -20,7 +20,7 @@ namespace monitor.api
 
             client.BaseAddress = new System.Uri(baseApiUrl);
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            string pingUrl = "ping?code=SLFribEKLIAG1ZvSrARu0b81ug2beT0wtREcfiwMY1RPjnRcj1YBiw==";
+            string pingUrl = "ping?code=" + System.Environment.GetEnvironmentVariable("DIGI_API_CODE_PING");
 
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, pingUrl);
             req.Content = new StringContent(content, Encoding.UTF8, "application/json");
@@ -44,7 +44,7 @@ namespace monitor.api
         //  Task<int> .. var tidl: async
         public static int FindOrCreateEnhetOppsett(EnhetOppsett enhetOppsett)
         {
-            string findOrCreateEnhetUrl = "find-or-create-enhet-oppsett?code=YReLjNgzTCfOkQOQJAFY0R0tYmWnLCEOZ8VjXv/Bvhgv3NY9NyACxQ==";
+            string findOrCreateEnhetUrl = "find-or-create-enhet-oppsett?code=" +  System.Environment.GetEnvironmentVariable("DIGI_API_CODE_ENHET");
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(baseApiUrl + findOrCreateEnhetUrl);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
@@ -68,7 +68,7 @@ namespace monitor.api
 
         public static  int FindOrCreateFunksjonellTest(String metodenavnTest, String funksjoneltNavnTest)
         {
-            string findOrCreateFunksjonellTestUrl = "find-or-create-funksjonell-test?code=pre8ud1bUaCL0Z28R5tBESwWKOewvaUXwz8ro3pTCd1Be2Zt863jFw==";
+            string findOrCreateFunksjonellTestUrl = "find-or-create-funksjonell-test?code="  + System.Environment.GetEnvironmentVariable("DIGI_API_CODE_FUNKTEST");
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(baseApiUrl + findOrCreateFunksjonellTestUrl);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
@@ -92,7 +92,7 @@ namespace monitor.api
 
         public static  int PostTestkjoring(Testkjoring testkjoring)
         {
-            string postTestKjoringUrl = "post-testkjoring?code=b/APCErgokFnPdOQkiYoWAgHALF6mAgzaXjPQKn3apXPCJl7fal67w==";
+            string postTestKjoringUrl = "post-testkjoring?code=" + System.Environment.GetEnvironmentVariable("DIGI_API_CODE_TESTKJORING");
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(baseApiUrl + postTestKjoringUrl);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
