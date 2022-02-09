@@ -17,14 +17,14 @@ schedules:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# steps:
+#- script: echo Hello, world!
+#  displayName: 'Run a one-line script'
 
-- script: |
-    echo Kjører selenium tester.
-    echo Gjøres hver natt
-  displayName: 'Kjører selenium tester'
+#- script: |
+#    echo Kjører selenium tester.
+#    echo Gjøres hver natt
+#  displayName: 'Kjører selenium tester'
 
 stages:
 - stage: run_ui_tests
