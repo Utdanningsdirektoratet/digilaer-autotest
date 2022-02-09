@@ -43,6 +43,6 @@ stages:
         - task: DotNetCoreCLI@2
           displayName: 'Kjør selenium tester'
           inputs:
-            command: 'run'
+            command: 'run $(DIGI_TEST)'
             arguments: ''
             projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
