@@ -44,6 +44,8 @@ namespace TestSuite
         private int funkTestIdForDB;
         private DateTime teststartForDB;
         private DateTime testsluttForDB;
+        private string UrlDigilaer = "https://digilaer.no";
+        private string UrlSkoleDigilaer = "https://skole.digilaer.no";
 
         public LoginTests(DeviceConfig deviceConfig)
         {
@@ -181,7 +183,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://digilaer.no");
+                driver.Navigate().GoToUrl(UrlDigilaer);
                 ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.ClassName("page__content"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
 
@@ -199,7 +201,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://digilaer.no");
+                driver.Navigate().GoToUrl(UrlDigilaer);
                 if(driver.FindElement(By.Id("language-switcher")).Displayed)
                 {
                     driver.FindElement(By.Id("language-switcher")).Click();
@@ -218,7 +220,7 @@ namespace TestSuite
                 HaandterMacSafari();
                 Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
 
-                driver.Navigate().GoToUrl("https://digilaer.no/nb/om-digilaerno");
+                driver.Navigate().GoToUrl(UrlDigilaer + "/nb/om-digilaerno");
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -231,7 +233,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
 
                 ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.Id("page"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
@@ -250,7 +252,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://digilaer.no");
+                driver.Navigate().GoToUrl(UrlDigilaer);
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 LoggUt();
@@ -266,7 +268,7 @@ namespace TestSuite
         {
             try
 			{
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 HaandterMacSafari();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 LoggUt();
@@ -282,7 +284,7 @@ namespace TestSuite
         {
             try
 			{
-                driver.Navigate().GoToUrl("https://digilaer.no");
+                driver.Navigate().GoToUrl(UrlDigilaer);
                 LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
                 LoggUt();
             } catch (Exception exception)
@@ -297,7 +299,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 GaaTilSeleniumFag();
@@ -318,7 +320,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 GaaTilSeleniumFag();
@@ -339,7 +341,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 GaaTilSeleniumFag();
 
@@ -384,7 +386,7 @@ namespace TestSuite
                 {
                     Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));
                 }
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 HaandterAlert();
                 HaandterMacSafari();
 
@@ -401,7 +403,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 GaaTilSeleniumFag();
 
@@ -420,7 +422,7 @@ namespace TestSuite
                     Thread.Sleep(5000); // spinner i zoom...
 
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed); // TODO: Forsøk å teste noe mer rundt zoom... denne treffer trolig kun toppen av html...
-                } else if(driver.Url.Contains("https://skole.digilaer.no"))
+                } else if(driver.Url.Contains(UrlSkoleDigilaer))
                 {
                     IWebElement iFrameZoom = driver.FindElement(By.Id("contentframe"));
 
@@ -441,7 +443,7 @@ namespace TestSuite
                     Thread.Sleep(5000); // spinner i Zoom
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
                 }
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 HaandterMacSafari();
                 LoggUt();
             } catch(Exception exception)
@@ -456,7 +458,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl("https://skole.digilaer.no");
+                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
                 LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
                 GaaTilSeleniumFag();
 
@@ -497,9 +499,12 @@ namespace TestSuite
             Thread.Sleep(2000);
             if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
             {
-                IWebElement orgSelector = driver.FindElement(By.Id("org_selector-selectized"));
+                IWebElement orgSelector = driver.FindElement(By.Id("org_selector_filter"));
                 orgSelector.SendKeys("Feide"); // For testing mot dataporten bruk "Tjenesteleverandør"
-                orgSelector.SendKeys(Keys.Enter);
+  
+                driver.FindElement(By.XPath("//span[.='Feide']")).Click();
+
+                driver.FindElement(By.Id("selectorg_button")).Click();
             }
 
             HaandterMacSafari();
@@ -509,7 +514,7 @@ namespace TestSuite
             driver.FindElement(By.XPath("//button[@type='submit']")).Click();
 
             HaandterMacSafari();
-            driver.Navigate().GoToUrl("https://skole.digilaer.no/my/index.php?lang=nb");
+            driver.Navigate().GoToUrl(UrlSkoleDigilaer + "/my/index.php?lang=nb");
             
             HaandterMacSafari();
             Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");

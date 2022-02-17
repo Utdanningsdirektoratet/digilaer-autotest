@@ -33,6 +33,7 @@ stages:
     - job: build
       displayName: Build and Test
       continueOnError: false
+      timeoutInMinutes: 360
       steps:
         - task: UseDotNet@2
           displayName: 'Using dotnet 5.0.x'
