@@ -44,8 +44,7 @@ namespace TestSuite
         private int funkTestIdForDB;
         private DateTime teststartForDB;
         private DateTime testsluttForDB;
-        private string UrlDigilaer = "https://digilaer.no";
-        private string UrlSkoleDigilaer = "https://skole.digilaer.no";
+        private string sprakUrl = "lang=nb";
 
         public LoginTests(DeviceConfig deviceConfig)
         {
@@ -103,19 +102,23 @@ namespace TestSuite
                 bsCaps = new BrowserStackCapabilities{device = "Google Pixel 4 XL", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
             }
 
-            // driver = seleniumSetup.GetFirefoxDriver(); // For lokal testing evt
+         //  driver = seleniumSetup.GetFirefoxDriver(); GlobalVariables.setStage(); /  GlobalVariables.setProd(); // For lokal debug evt
              driver = seleniumSetup.GetBrowserstackDriver(bsCaps);
         }
 
         [OneTimeSetUp]
         public void Init()
         {
-            LogWriter.LogWrite("Starter seleniumtest på en device.");
-            enhetIdForDB =  MonitorApiClient.FindOrCreateEnhetOppsett(new EnhetOppsett{
-                enhet = bsCaps.device, nettleserNavn = bsCaps.browser, nettleserVersjon = bsCaps.browserVersion,
-                osNavn = bsCaps.os, osVersjon = bsCaps.osVersion, opplosning = bsCaps.resolution
-            });
-            Console.WriteLine("Id mottatt er :  " + enhetIdForDB);
+            LogWriter.LogWrite("Starter seleniumtest på en device i " + GlobalVariables.miljo);
+            if(GlobalVariables.ErProd())
+            {
+                enhetIdForDB =  MonitorApiClient.FindOrCreateEnhetOppsett(new EnhetOppsett{
+                    enhet = bsCaps.device, nettleserNavn = bsCaps.browser, nettleserVersjon = bsCaps.browserVersion,
+                    osNavn = bsCaps.os, osVersjon = bsCaps.osVersion, opplosning = bsCaps.resolution
+                });
+                Console.WriteLine("Id mottatt er :  " + enhetIdForDB);
+            }
+            
             MaksimerVindu();
         }
 
@@ -141,8 +144,11 @@ namespace TestSuite
             {
                 resultatTekst = oppsettTekst + ":\n"
                 + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n"
-                + resultatTekst
-                + "\nKanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
+                + resultatTekst;
+                if(GlobalVariables.ErProd())
+                {
+                    resultatTekst += "\nKanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
+                }
                 ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");
             } else
             {
@@ -158,20 +164,22 @@ namespace TestSuite
         [TearDown]
         public void AfterEachTest()
         {
-            funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
+            if(GlobalVariables.ErProd())
+            {
+                funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
 
-             MonitorApiClient.PostTestkjoring(new Testkjoring{
-                enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
-                starttid = teststartForDB, sluttid = DateTime.Now,
-                debugInformasjon = TestContext.CurrentContext.Result.Message + TestContext.CurrentContext.Result.StackTrace});
+                MonitorApiClient.PostTestkjoring(new Testkjoring{
+                    enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
+                    starttid = teststartForDB, sluttid = DateTime.Now,
+                    debugInformasjon = TestContext.CurrentContext.Result.Message + TestContext.CurrentContext.Result.StackTrace});
+            }
 
             if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed))
             {
                 // Utkommentert for å ikke overfylle slack kanalen etter kjøring. Fokus på evt feilede tester heller.
-                // resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n"; 
-            }
-            else if (TestContext.CurrentContext.Result.Outcome.Equals(TestStatus.Failed) ||
-            TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) || TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
+                // resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n";
+            } else if (TestContext.CurrentContext.Result.Outcome.Equals(TestStatus.Failed) ||
+                TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) || TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
             {
                 resultatTekst += ":x:" + TestContext.CurrentContext.Test.Name + "\n";
             }
@@ -183,7 +191,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlDigilaer);
+                GaaTilDigilaer();
                 ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.ClassName("page__content"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
 
@@ -201,7 +209,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlDigilaer);
+                GaaTilDigilaer();
                 if(driver.FindElement(By.Id("language-switcher")).Displayed)
                 {
                     driver.FindElement(By.Id("language-switcher")).Click();
@@ -220,7 +228,7 @@ namespace TestSuite
                 HaandterMacSafari();
                 Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
 
-                driver.Navigate().GoToUrl(UrlDigilaer + "/nb/om-digilaerno");
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl + "/nb/om-digilaerno");
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -233,7 +241,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                GaaTilSkoleDigilaer();
 
                 ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.Id("page"));
                 Assert.That(sideelementer.Count, Is.GreaterThan(0));
@@ -250,9 +258,14 @@ namespace TestSuite
         [TestCase(TestName = "Elev kan logge på med Feide via digilaer.no")]
         public void LoggInnOgUtAvDigilaerMedFeide()
         {
+            if(GlobalVariables.ErStage())
+            {                
+                Assert.Ignore(); // Skip test siden det ikke er stage-innlogging med feide fra annet sted enn hovedsiden
+            }
+            
             try
             {
-                driver.Navigate().GoToUrl(UrlDigilaer);
+                GaaTilDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 LoggUt();
@@ -268,7 +281,7 @@ namespace TestSuite
         {
             try
 			{
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                GaaTilSkoleDigilaer();
                 HaandterMacSafari();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 LoggUt();
@@ -284,7 +297,7 @@ namespace TestSuite
         {
             try
 			{
-                driver.Navigate().GoToUrl(UrlDigilaer);
+                GaaTilSkoleDigilaer();
                 LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
                 LoggUt();
             } catch (Exception exception)
@@ -299,7 +312,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 GaaTilSeleniumFag();
@@ -320,7 +333,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
                 GaaTilSeleniumFag();
@@ -341,7 +354,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 GaaTilSeleniumFag();
 
@@ -386,7 +399,7 @@ namespace TestSuite
                 {
                     Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));
                 }
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
                 HaandterAlert();
                 HaandterMacSafari();
 
@@ -403,7 +416,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
                 GaaTilSeleniumFag();
 
@@ -422,7 +435,7 @@ namespace TestSuite
                     Thread.Sleep(5000); // spinner i zoom...
 
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed); // TODO: Forsøk å teste noe mer rundt zoom... denne treffer trolig kun toppen av html...
-                } else if(driver.Url.Contains(UrlSkoleDigilaer))
+                } else if(driver.Url.Contains(GlobalVariables.digilaerSkoleUrl))
                 {
                     IWebElement iFrameZoom = driver.FindElement(By.Id("contentframe"));
 
@@ -443,7 +456,7 @@ namespace TestSuite
                     Thread.Sleep(5000); // spinner i Zoom
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
                 }
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
                 HaandterMacSafari();
                 LoggUt();
             } catch(Exception exception)
@@ -458,7 +471,7 @@ namespace TestSuite
         {
             try
             {
-                driver.Navigate().GoToUrl(UrlSkoleDigilaer);
+                GaaTilSkoleDigilaer();
                 LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
                 GaaTilSeleniumFag();
 
@@ -497,6 +510,15 @@ namespace TestSuite
 
             HaandterMacSafari();
             Thread.Sleep(2000);
+
+            if(GlobalVariables.ErStage())
+            {
+                driver.FindElement(By.Id("dropdownlist")).Click();
+                driver.FindElements(By.TagName("option"))[1].Click();
+                driver.FindElement(By.ClassName("btn")).Click();
+                HaandterMacSafari();
+            }
+
             if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
             {
                 IWebElement orgSelector = driver.FindElement(By.Id("org_selector_filter"));
@@ -512,9 +534,15 @@ namespace TestSuite
             driver.FindElement(By.Id("password")).SendKeys(passord);
 
             driver.FindElement(By.XPath("//button[@type='submit']")).Click();
-
             HaandterMacSafari();
-            driver.Navigate().GoToUrl(UrlSkoleDigilaer + "/my/index.php?lang=nb");
+
+            if(GlobalVariables.ErStage())
+            {
+               driver.FindElement(By.XPath("//button[@type='submit']")).Click(); 
+               HaandterMacSafari();
+            }
+
+            driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             
             HaandterMacSafari();
             Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
@@ -536,6 +564,26 @@ namespace TestSuite
             HaandterMacSafari();
         }
 
+        private void GaaTilDigilaer()
+        {
+            driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
+            ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("agree-button"));
+            if(agreeKnappeListe.Count > 0)
+            {
+                agreeKnappeListe[0].Click();
+            }
+        }
+
+        private void GaaTilSkoleDigilaer()
+        {
+            driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/?" + sprakUrl);
+            ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("eupopup-button"));
+            if(agreeKnappeListe.Count > 0)
+            {
+                agreeKnappeListe[0].Click();
+            }
+        }
+
         private void GaaTilSeleniumFag()
         {
             HaandterMacSafari();
@@ -545,6 +593,12 @@ namespace TestSuite
             if(hamburgerButton.GetAttribute("aria-expanded").Equals("false"))
             {
                 hamburgerButton.Click();
+            }
+
+            ReadOnlyCollection<IWebElement> merKnapper = driver.FindElements(By.XPath("//a[@data-key='courseindexpage']"));
+            if(merKnapper.Count > 0)
+            {
+                merKnapper[0].Click();
             }
 
             driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();

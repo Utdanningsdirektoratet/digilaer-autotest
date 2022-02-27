@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger: none
 
 schedules:
@@ -16,15 +11,6 @@ schedules:
 
 pool:
   vmImage: ubuntu-latest
-
-# steps:
-#- script: echo Hello, world!
-#  displayName: 'Run a one-line script'
-
-#- script: |
-#    echo Kjører selenium tester.
-#    echo Gjøres hver natt
-#  displayName: 'Kjører selenium tester'
 
 stages:
 - stage: run_ui_tests
@@ -41,9 +27,18 @@ stages:
             packageType: 'sdk'
             version: '5.0.x'
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Kjør selenium tester'
+        - task: RunNattligTests
+          displayName: 'Kjør selenium tester prod'
           inputs:
             command: 'run'
-            arguments: '$(DIGI_TEST) $(DIGI_TEST)'
+            arguments: 'chron'
             projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
+          condition: eq(variables['Build.Reason'], 'Schedule')
+
+        - task: RunManuellTriggetTests
+        displayName: 'Kjør selenium tester manuell trigging'
+        inputs:
+          command: 'run'
+          arguments: 'manuell'
+          projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'    
+        condition: ne(variables['Build.Reason'], 'Schedule')

@@ -3,6 +3,7 @@ using Newtonsoft.Json.Converters;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Remote;
+using Utils;
 
 namespace Selenium
 {
@@ -36,7 +37,7 @@ namespace Selenium
             capability.AddAdditionalCapability("device", bsCaps.device);
             capability.AddAdditionalCapability("browser_version", bsCaps.browserVersion);
             capability.AddAdditionalCapability("name", "Test med " + GetNameString(bsCaps));
-            capability.AddAdditionalCapability("build", "BStack_Build_" + GetBuildString(bsCaps));
+            capability.AddAdditionalCapability("build", GetBuildString(bsCaps));
             capability.AddAdditionalCapability("browserstack.local", bsCaps.local);
             capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
             capability.AddAdditionalCapability("browserstack.seleniumLogs", "false");
@@ -81,7 +82,7 @@ namespace Selenium
 
         private static string GetBuildString(BrowserStackCapabilities bsCaps)
         {
-            string buildString = "";
+            string buildString = "BStack_" + GlobalVariables.miljo + "_";
             if(bsCaps.os != null)
             {
                 buildString += bsCaps.os + "_" + bsCaps.osVersion;

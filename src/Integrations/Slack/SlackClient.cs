@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Text;
+using Utils;
 
 namespace Slack
 {
@@ -7,17 +8,14 @@ namespace Slack
     {
         private static string baseSlackUrl = "https://hooks.slack.com/";
         private static string slackHookUrl = "services/" + System.Environment.GetEnvironmentVariable("DIGI_SLACK_WEBHOOK_PW");
-        private static string slackChannel = "#autotest_digilær";
-
         private static string slackUserName = "Digilær Autotest";
 
         public static async void CallSlack(string slackText)
         {
             HttpClient client = new HttpClient();
             
-            string slackEmoji =  ":digilaer:";
-
-            string content = "{\"channel\" : \"" + slackChannel + "\", \"username\": \"" + slackUserName + "\", \"text\": \""+ slackText +"\", \"icon_emoji\": \"" + slackEmoji + "\"}";
+            string slackEmoji =  ":digilaer:"; 
+            string content = "{\"channel\" : \"" + "#autotest_digilær_" + GlobalVariables.miljo + "\", \"username\": \"" + slackUserName + "\", \"text\": \""+ slackText +"\", \"icon_emoji\": \"" + slackEmoji + "\"}";
             client.BaseAddress = new System.Uri(baseSlackUrl);
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             

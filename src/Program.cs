@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnitLite;
+using Utils;
 
 namespace digilaer_autotest
 {
@@ -8,8 +9,26 @@ namespace digilaer_autotest
         static int Main(string[] args)
         {
             Console.WriteLine("Digilær Autotest start");
-            Console.WriteLine("0 = " + args[0] + ", 1 = " + args[1]);
 
+            if(args != null && args.Length > 0)
+            {
+                Console.WriteLine("0 = " + args[0]);
+                if(args[0].Equals("manuell"))
+                {
+                    // Manuell kjøring styres med miljøvariabel
+                    if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("stage"))
+                    {
+                        GlobalVariables.SetStage();
+                    } else if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("prod"))
+                    {
+                        GlobalVariables.SetProd();
+                    }
+                } else if(args[0].Equals("chron"))
+                {
+                    // Nattlig jobb er alltid mot produksjon
+                    GlobalVariables.SetProd();
+                }
+            }
             return new AutoRun().Execute(new string[0]);
         }
     }
