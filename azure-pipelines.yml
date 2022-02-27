@@ -27,7 +27,7 @@ stages:
             packageType: 'sdk'
             version: '5.0.x'
 
-        - task: RunNattligTests@2
+        - task: DotNetCoreCLI@2
           displayName: 'Kjør selenium tester prod'
           inputs:
             command: 'run'
@@ -35,7 +35,7 @@ stages:
             projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
           condition: eq(variables['Build.Reason'], 'Schedule')
 
-        - task: RunManuellTriggetTests@2
+        - task: DotNetCoreCLI@2
           displayName: 'Kjør selenium tester manuell trigging'
           inputs:
             command: 'run'
