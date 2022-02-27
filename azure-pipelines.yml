@@ -36,9 +36,9 @@ stages:
           condition: eq(variables['Build.Reason'], 'Schedule')
 
         - task: RunManuellTriggetTests
-        displayName: 'Kjør selenium tester manuell trigging'
-        inputs:
-          command: 'run'
-          arguments: 'manuell'
-          projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'    
-        condition: ne(variables['Build.Reason'], 'Schedule')
+          displayName: 'Kjør selenium tester manuell trigging'
+          inputs:
+            command: 'run'
+            arguments: 'manuell'
+            projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'    
+          condition: ne(variables['Build.Reason'], 'Schedule')
