@@ -110,7 +110,7 @@ namespace TestSuite
         public void Init()
         {
             LogWriter.LogWrite("Starter seleniumtest på en device i " + GlobalVariables.miljo);
-            if(GlobalVariables.ErProd())
+            if(GlobalVariables.ErProd() && GlobalVariables.loggTilDatabase)
             {
                 enhetIdForDB =  MonitorApiClient.FindOrCreateEnhetOppsett(new EnhetOppsett{
                     enhet = bsCaps.device, nettleserNavn = bsCaps.browser, nettleserVersjon = bsCaps.browserVersion,
@@ -145,7 +145,7 @@ namespace TestSuite
                 resultatTekst = oppsettTekst + ":\n"
                 + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n"
                 + resultatTekst;
-                if(GlobalVariables.ErProd())
+                if(GlobalVariables.ErProd()  && GlobalVariables.loggTilDatabase) // Hvis vanlig monitoreringskjøring
                 {
                     resultatTekst += "\nKanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
                 }
@@ -164,7 +164,7 @@ namespace TestSuite
         [TearDown]
         public void AfterEachTest()
         {
-            if(GlobalVariables.ErProd())
+            if(GlobalVariables.ErProd()  && GlobalVariables.loggTilDatabase)
             {
                 funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
 
@@ -567,10 +567,16 @@ namespace TestSuite
         private void GaaTilDigilaer()
         {
             driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
+            Thread.Sleep(2000); // Kan ta litt tid før cookie-knapp plutselig kommer
             ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("agree-button"));
-            if(agreeKnappeListe.Count > 0)
+            if(agreeKnappeListe.Count > 0 && agreeKnappeListe[0].Enabled)
             {
-                agreeKnappeListe[0].Click();
+                try{
+                    agreeKnappeListe[0].Click();
+                } catch(Exception e)
+                {
+                    Console.WriteLine("Aksepter cookies lot se ikke klikke. Antall cookie-knapper: " + agreeKnappeListe.Count);
+                }
             }
         }
 
