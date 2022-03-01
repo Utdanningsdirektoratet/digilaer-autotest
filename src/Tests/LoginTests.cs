@@ -315,7 +315,7 @@ namespace TestSuite
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
-                GaaTilSeleniumFag();
+                GaaTilSeleniumFagSomElev();
                 string pageSource = driver.PageSource;
 
                 Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
@@ -336,7 +336,7 @@ namespace TestSuite
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
-                GaaTilSeleniumFag();
+                GaaTilSeleniumFagSomElev();
 
                 ReadOnlyCollection<IWebElement> redigeringsknapp = driver.FindElements(By.XPath("//button[.='Slå redigering på']"));
                 Assert.That(redigeringsknapp.Count, Is.Zero);
@@ -355,7 +355,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
                 GaaTilSeleniumFag();
 
                 string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
@@ -418,7 +418,7 @@ namespace TestSuite
             {
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
-                GaaTilSeleniumFag();
+                GaaTilSeleniumFagSomElev();
 
                 driver.FindElement(By.XPath("//span[contains(text(), 'SELENIUM test av Zoom')]")).Click();
 
@@ -551,6 +551,16 @@ namespace TestSuite
         private void LoggUt()
         {
             HaandterMacSafari();
+            
+            AapneBrukerMeny();
+
+            HaandterMacSafari();
+            driver.FindElement(By.XPath("//span[.='Logg ut']")).Click();
+            HaandterMacSafari();
+        }
+
+        private void AapneBrukerMeny()
+        {
             try
             {
                 driver.FindElement(By.ClassName("avatars")).Click();
@@ -558,12 +568,7 @@ namespace TestSuite
             {
                 driver.FindElement(By.ClassName("usermenu")).Click();
             }
-
-            HaandterMacSafari();
-            driver.FindElement(By.XPath("//span[.='Logg ut']")).Click();
-            HaandterMacSafari();
         }
-
         private void GaaTilDigilaer()
         {
             driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
@@ -608,6 +613,20 @@ namespace TestSuite
             }
 
             driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
+            HaandterMacSafari();
+        }
+
+        private void GaaTilSeleniumFagSomElev()
+        {
+        // Midlertidig metode inntil Mer-knapp fikses som er der for elev. Benytt senere GaaTilSeleniumFag() som elev også
+            HaandterMacSafari();
+
+            AapneBrukerMeny();
+
+            driver.FindElement(By.XPath("//span[.='Karakterer']")).Click();
+            driver.FindElement(By.LinkText("Selenium")).Click();
+            driver.FindElements(By.ClassName("gradeitemheader"))[0].Click();
+            driver.FindElement(By.LinkText(fagkodeSelenium)).Click();
             HaandterMacSafari();
         }
 
