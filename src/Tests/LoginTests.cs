@@ -315,7 +315,7 @@ namespace TestSuite
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
-                GaaTilSeleniumFagSomElev();
+                GaaTilSeleniumFag();
                 string pageSource = driver.PageSource;
 
                 Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
@@ -336,75 +336,13 @@ namespace TestSuite
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
 
-                GaaTilSeleniumFagSomElev();
+                GaaTilSeleniumFag();
 
                 ReadOnlyCollection<IWebElement> redigeringsknapp = driver.FindElements(By.XPath("//button[.='Slå redigering på']"));
                 Assert.That(redigeringsknapp.Count, Is.Zero);
   
                 LoggUt();
             } catch (Exception exception)
-            {
-                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
-            }
-        }
-
-        [Test]
-        [TestCase(TestName = "Last AdobeConnect-side")]
-        public void TestAdobeConnect()
-        {
-            try
-            {
-                GaaTilSkoleDigilaer();
-                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
-                GaaTilSeleniumFag();
-
-                string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
-                driver.Navigate().GoToUrl(adobeConnectUrl);
-
-                string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
-                int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
-                moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
-                driver.Navigate().GoToUrl(moteUrl);
-                Thread.Sleep(15000); // Lang lastetid og flere redirects
-
-                if(bsCaps.realMobile == null)
-                {
-                    IWebElement iFrameAdobe = driver.FindElement(By.Id("html-meeting-frame"));
-
-                    Assert.IsTrue(iFrameAdobe.Displayed);
-
-                    driver.SwitchTo().Frame(iFrameAdobe);
-                    String source = driver.PageSource;
-                    Assert.True(source.Contains("attendeePodContainerDiv"), "Siden inneholder ikke attendeePodContainerDiv");
-
-                    if(driver.FindElement(By.Id("download-app-notifier_1")) != null && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
-                    {
-                        driver.FindElement(By.Id("download-app-notifier_1")).Click();
-                    }
-
-                    if(driver.FindElement(By.XPath("//span[.='Close']")) != null && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
-                    {
-                        driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
-                    }
-
-                    if(driver.FindElement(By.XPath("//span[.='Display Media']")) != null && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
-                    {
-                        driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
-                    }
-
-                    Assert.True(driver.FindElement(By.Id("attendeePodContainerDiv")).Displayed, "Div for deltakere ikke funnet (attendeePodContainerDiv)");
-
-                    driver.SwitchTo().ParentFrame();
-                } else // Mobiler/tablets krever egen app. Gjør kun en assert:
-                {
-                    Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));
-                }
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
-                HaandterAlert();
-                HaandterMacSafari();
-
-                LoggUt();
-            } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
@@ -418,7 +356,7 @@ namespace TestSuite
             {
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, feidePw);
-                GaaTilSeleniumFagSomElev();
+                GaaTilSeleniumFag();
 
                 driver.FindElement(By.XPath("//span[contains(text(), 'SELENIUM test av Zoom')]")).Click();
 
@@ -481,6 +419,69 @@ namespace TestSuite
                 Assert.That(redigerknapper.Count, Is.GreaterThan(6));
 
                 driver.FindElement(By.XPath("//button[.='Slå redigering av']")).Click();
+
+                LoggUt();
+            } catch(Exception exception)
+            {
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+        }
+
+
+        [Test]
+        [TestCase(TestName = "Last AdobeConnect-side")]
+        public void TestAdobeConnect()
+        {
+            try
+            {
+                GaaTilSkoleDigilaer();
+                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
+                GaaTilSeleniumFag();
+
+                string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
+                driver.Navigate().GoToUrl(adobeConnectUrl);
+
+                string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
+                int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
+                moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
+                driver.Navigate().GoToUrl(moteUrl);
+                Thread.Sleep(15000); // Lang lastetid og flere redirects
+
+                if(bsCaps.realMobile == null)
+                {
+                    IWebElement iFrameAdobe = driver.FindElement(By.Id("html-meeting-frame"));
+
+                    Assert.IsTrue(iFrameAdobe.Displayed);
+
+                    driver.SwitchTo().Frame(iFrameAdobe);
+                    String source = driver.PageSource;
+                    Assert.True(source.Contains("attendeePodContainerDiv"), "Siden inneholder ikke attendeePodContainerDiv");
+
+                    if(driver.FindElement(By.Id("download-app-notifier_1")) != null && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
+                    {
+                        driver.FindElement(By.Id("download-app-notifier_1")).Click();
+                    }
+
+                    if(driver.FindElement(By.XPath("//span[.='Close']")) != null && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
+                    {
+                        driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
+                    }
+
+                    if(driver.FindElement(By.XPath("//span[.='Display Media']")) != null && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
+                    {
+                        driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
+                    }
+
+                    Assert.True(driver.FindElement(By.Id("attendeePodContainerDiv")).Displayed, "Div for deltakere ikke funnet (attendeePodContainerDiv)");
+
+                    driver.SwitchTo().ParentFrame();
+                } else // Mobiler/tablets krever egen app. Gjør kun en assert:
+                {
+                    Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));
+                }
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+                HaandterAlert();
+                HaandterMacSafari();
 
                 LoggUt();
             } catch(Exception exception)
@@ -613,20 +614,6 @@ namespace TestSuite
             }
 
             driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
-            HaandterMacSafari();
-        }
-
-        private void GaaTilSeleniumFagSomElev()
-        {
-        // Midlertidig metode inntil Mer-knapp fikses som er der for elev. Benytt senere GaaTilSeleniumFag() som elev også
-            HaandterMacSafari();
-
-            AapneBrukerMeny();
-
-            driver.FindElement(By.XPath("//span[.='Karakterer']")).Click();
-            driver.FindElement(By.LinkText("Selenium")).Click();
-            driver.FindElements(By.ClassName("gradeitemheader"))[0].Click();
-            driver.FindElement(By.LinkText(fagkodeSelenium)).Click();
             HaandterMacSafari();
         }
 
