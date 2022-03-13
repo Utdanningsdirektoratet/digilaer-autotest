@@ -168,10 +168,16 @@ namespace TestSuite
             {
                 funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
 
+                string debugInfo = TestContext.CurrentContext.Result.Message + TestContext.CurrentContext.Result.StackTrace;
+                if(debugInfo != null && debugInfo.Length > 1500)
+                {
+                    debugInfo = debugInfo.Substring(0, 250) + "[...]" + debugInfo.Substring(debugInfo.Length - 1200, 1200);
+                }
+
                 MonitorApiClient.PostTestkjoring(new Testkjoring{
                     enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
                     starttid = teststartForDB, sluttid = DateTime.Now,
-                    debugInformasjon = TestContext.CurrentContext.Result.Message + TestContext.CurrentContext.Result.StackTrace});
+                    debugInformasjon = debugInfo});
             }
 
             if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed))
@@ -182,7 +188,7 @@ namespace TestSuite
                 TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) || TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error))
             {
                 resultatTekst += ":x:" + TestContext.CurrentContext.Test.Name + "\n";
-            }
+        }
         }
 
         [Test]
