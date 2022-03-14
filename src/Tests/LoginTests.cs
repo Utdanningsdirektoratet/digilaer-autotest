@@ -473,6 +473,7 @@ namespace TestSuite
                         driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
                     }
 
+                    Thread.Sleep(5000);
                     if(driver.FindElement(By.XPath("//span[.='Display Media']")) != null && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
                     {
                         driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
