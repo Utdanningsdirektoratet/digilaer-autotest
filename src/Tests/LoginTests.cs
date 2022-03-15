@@ -666,6 +666,9 @@ namespace TestSuite
         {
             Printscreen.TakeScreenShot(driver, testnavn);
             LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
+            
+            HaandterAlert();
+            GaaTilSkoleDigilaer();
             try {
                 LoggUt();
             } catch(Exception ex)
