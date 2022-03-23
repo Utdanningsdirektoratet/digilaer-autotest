@@ -52,6 +52,16 @@ namespace Selenium
 //          ChromeOptions options = new ChromeOptions(); //Execute Selenium Chrome WebDriver in silent mode
 //          options.AddArgument("--log-level=3");
 
+            if(bsCaps.device != null && (bsCaps.device.Contains("iPad") || bsCaps.device.Contains("iPhone")))
+            {
+                capability.AddAdditionalCapability("safariAllowPopups", "true");
+            }
+
+            /* if(bsCaps.device != null)
+            {
+                capability.AddAdditionalCapability("browserstack.autoAcceptAlerts", "true");
+            } */
+
             IWebDriver driver = new RemoteWebDriver(new Uri("http://hub-cloud.browserstack.com/wd/hub"), capability);
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10); // Implisitt venting 10 sekunder
 
