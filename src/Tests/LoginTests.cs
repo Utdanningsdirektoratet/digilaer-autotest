@@ -824,12 +824,12 @@ namespace TestSuite
 
         private void AapneBrukerMeny()
         {
-            if(driver.FindElements(By.ClassName("usermenu")).Count > 0)
-            {
-                driver.FindElement(By.ClassName("usermenu")).Click();
-            } else if(driver.FindElements(By.ClassName("avatars")).Count > 0)
+            try
             {
                 driver.FindElement(By.ClassName("avatars")).Click();
+            } catch(Exception e)
+            {
+                driver.FindElement(By.ClassName("usermenu")).Click();
             }
         }
 
