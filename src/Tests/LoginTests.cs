@@ -910,7 +910,13 @@ namespace TestSuite
         private void HaandterAlert()
         {
             Thread.Sleep(2000);
-            driver.SwitchTo().Alert().Accept();
+            try
+            {
+                driver.SwitchTo().Alert().Accept();
+            } catch(Exception e)
+            {
+                Console.WriteLine("Alert håndtering exception catched");
+            }
         }
 
         private void HaandterFeiletTest(Exception e, string testnavn)
