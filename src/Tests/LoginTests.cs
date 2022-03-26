@@ -189,7 +189,7 @@ namespace TestSuite
                 MonitorApiClient.PostTestkjoring(new Testkjoring{
                     enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
                     starttid = teststartForDB, sluttid = DateTime.Now,
-                    debugInformasjon = debugInfo});
+                    debugInformasjon = ""});
                  
                 if((int)TestContext.CurrentContext.Result.Outcome.Status == 4) // TEMP logging ifbm feilsøking både nedenfor og over
                 {
@@ -909,32 +909,8 @@ namespace TestSuite
 
         private void HaandterAlert()
         {
-            try
-            {
-                if(bsCaps.device == null)
-                {
-                    Thread.Sleep(2000);
-                    driver.SwitchTo().Alert().Accept();
-                } else
-                {
-                //    TODO: Implement fix for phones/tablets..
-                //    driver.Context
-                //    driver.SwitchTo("NATIVE_APP"); // driver.Context = ("NATIVE_APP"); 
-                //    if(bsCaps.device.Contains("iPad") || bsCaps.device.Contains("iPhone"))
-                //    {
-                //        IWebElement element =  driver.FindElement(By.Id("Allow"));
-                //        element.Click();
-                //    } else // Android
-                //    {
-                //        IWebElement element =  driver.FindElement(By.XPath(".//android.widget.Button[@text='Continue']"));
-                //        element.Click();
-                //    }
-                //     driver.context("WEBVIEW"");
-                }
-            } catch(Exception e) 
-            {
-                // Alert not present
-            } 
+            Thread.Sleep(2000);
+            driver.SwitchTo().Alert().Accept();
         }
 
         private void HaandterFeiletTest(Exception e, string testnavn)

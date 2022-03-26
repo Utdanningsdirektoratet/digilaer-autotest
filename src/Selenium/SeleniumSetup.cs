@@ -9,7 +9,6 @@ namespace Selenium
 {
     public class SeleniumSetup
     {
-
         private static string BrowserStackUsername = System.Environment.GetEnvironmentVariable("DIGI_BS_USER");
         private static string BrowserStackKey = System.Environment.GetEnvironmentVariable("DIGI_BS_KEY");
         private static int timeoutSekunder = 10;
@@ -21,6 +20,7 @@ namespace Selenium
                 capability = new OpenQA.Selenium.Safari.SafariOptions();
             } else if(bsCaps.browser.Contains("Firefox")) {
                 //capability = new OpenQA.Selenium.Firefox.FirefoxOptions();
+
                 capability = new OpenQA.Selenium.Edge.EdgeOptions();
              } else if(bsCaps.browser.Contains("Chrome") || bsCaps.browser.Contains("Android")) {
                 capability = new OpenQA.Selenium.Chrome.ChromeOptions();
@@ -45,6 +45,7 @@ namespace Selenium
             capability.AddAdditionalCapability("browserstack.video", "true");
             capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
             capability.AddAdditionalCapability("browserstack.networkLogs", "false");
+            capability.AddAdditionalCapability("browserstack.appium_version", "1.22.0");
 
             capability.AddAdditionalCapability("browserstack.user", BrowserStackUsername);
             capability.AddAdditionalCapability("browserstack.key", BrowserStackKey);
@@ -138,10 +139,10 @@ namespace Selenium
         Ipad11Pro2020,
         AndroidGalaxyS20,
         AndroidGalaxyTabS7,
-         AndroidGalaxyS21,
-         AndroidOnePlus9,
-         GooglePixel6,
-         GooglePixel4XL,
-         SamsungGalaxyS10
+        AndroidGalaxyS21,
+        AndroidOnePlus9,
+        GooglePixel6,
+        GooglePixel4XL,
+        SamsungGalaxyS10
     }
 }
