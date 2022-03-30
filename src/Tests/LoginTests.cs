@@ -537,56 +537,58 @@ namespace TestSuite
         [TestCase(TestName = "Test Poodl MiniLesson diktat")]
         public void TestPoodlMinilessonDiktat()
         {
-            if(GlobalVariables.ErStage()) // Skal kun testes på Stage
-            {                
-                try
+            if(GlobalVariables.ErProd())
+            {
+                Assert.Ignore(); // Skal kun testes på Stage
+            }
+
+            try
+            {
+                GaaTilSkoleDigilaer();
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+
+                GaaTilSeleniumFag();
+                
+                // Gå inn på poodl minilesson
+                driver.FindElement(By.XPath("//span[starts-with(., 'Poodll')]")).Click();
+                Thread.Sleep(3000);
+                if(driver.FindElements(By.ClassName("btn_finished_attempt")).Count > 0 &&
+                        driver.FindElement(By.ClassName("btn_finished_attempt")).Displayed)
                 {
-                    GaaTilSkoleDigilaer();
-                    LoggInnMedFeide(studentUnder18Fnr, feidePw);
-
-                    GaaTilSeleniumFag();
+                    driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
+                    Thread.Sleep(3000); // Trengs i FF hvertfall.
                     
-                    // Gå inn på poodl minilesson
-                    driver.FindElement(By.XPath("//span[starts-with(., 'Poodll')]")).Click();
-                    Thread.Sleep(3000);
-                    if(driver.FindElements(By.ClassName("btn_finished_attempt")).Count > 0 &&
-                         driver.FindElement(By.ClassName("btn_finished_attempt")).Displayed)
-                    {
-                        driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
-                        Thread.Sleep(3000); // Trengs i FF hvertfall.
-                        
-                        driver.FindElement(By.XPath("//button[@data-action='save']")).Click();
-                        HaandterMacSafari();
-                    }
-                    
-                    driver.FindElement(By.ClassName("fa-play")).Click();
-                    Thread.Sleep(500);
-                    Assert.True(driver.FindElement(By.ClassName("fa-spinner")).Displayed);
-                    Thread.Sleep(10000);
-                    Assert.True(driver.FindElement(By.ClassName("fa-play")).Displayed);
-
-                    IWebElement inputFelt = driver.FindElement(By.XPath("//input[@maxlength='6']"));
-                    inputFelt.SendKeys("alw");
-                    Thread.Sleep(1000);
-                    Assert.True(driver.FindElement(By.ClassName("fa-times")).Displayed);
-                    Assert.False(driver.FindElement(By.ClassName("fa-check")).Displayed);
-
-                    inputFelt.SendKeys("ays");
-                    Thread.Sleep(1000);
-                    Assert.True(driver.FindElements(By.ClassName("fa-check"))[1].Displayed);
-                    
-                    driver.FindElement(By.ClassName("minilesson_nextbutton")).Click();
-                    Thread.Sleep(3000);
-        
-                    //driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
-                     //Thread.Sleep(3000);
-                    //driver.FindElement(By.ClassName("btn-primary")).Click();
-
-                    LoggUt();
-                } catch (Exception exception)
-                {
-                    HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                    driver.FindElement(By.XPath("//button[@data-action='save']")).Click();
+                    HaandterMacSafari();
                 }
+                
+                driver.FindElement(By.ClassName("fa-play")).Click();
+                Thread.Sleep(500);
+                Assert.True(driver.FindElement(By.ClassName("fa-spinner")).Displayed);
+                Thread.Sleep(10000);
+                Assert.True(driver.FindElement(By.ClassName("fa-play")).Displayed);
+
+                IWebElement inputFelt = driver.FindElement(By.XPath("//input[@maxlength='6']"));
+                inputFelt.SendKeys("alw");
+                Thread.Sleep(1000);
+                Assert.True(driver.FindElement(By.ClassName("fa-times")).Displayed);
+                Assert.False(driver.FindElement(By.ClassName("fa-check")).Displayed);
+
+                inputFelt.SendKeys("ays");
+                Thread.Sleep(1000);
+                Assert.True(driver.FindElements(By.ClassName("fa-check"))[1].Displayed);
+                
+                driver.FindElement(By.ClassName("minilesson_nextbutton")).Click();
+                Thread.Sleep(3000);
+    
+                //driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
+                    //Thread.Sleep(3000);
+                //driver.FindElement(By.ClassName("btn-primary")).Click();
+
+                LoggUt();
+            } catch (Exception exception)
+            {
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
@@ -594,113 +596,117 @@ namespace TestSuite
         [TestCase(TestName = "Test Moodle Quiz med gap fill dra ord")]
         public void TestMoodleQuizMedGapFill()
         {
-            if(GlobalVariables.ErStage()) // Skal kun testes på Stage
+            if(GlobalVariables.ErProd())
             {
-                try
-                {
-                    GaaTilSkoleDigilaer();
-                    LoggInnMedFeide(studentUnder18Fnr, feidePw);
-
-                    GaaTilSeleniumFag();
-                    
-                    driver.FindElement(By.XPath("//span[starts-with(., '1 Tall og siffer')]")).Click();
-                    HaandterMacSafari();
-
-                    if(driver.FindElements(By.XPath("//button[.='Fortsett med forrige forsøk']")).Count > 0)
-                    {
-                        driver.FindElement(By.XPath("//button[.='Fortsett med forrige forsøk']")).Click();
-                    } else if(driver.FindElements(By.XPath("//button[.='Ta quizen nå']")).Count > 0) {
-                        driver.FindElement(By.XPath("//button[.='Ta quizen nå']")).Click();
-                    } else {
-                        driver.FindElement(By.XPath("//button[.='Fortsett siste forhåndsvisning']")).Click();
-                    }
-
-                    HaandterMacSafari();
-                    IWebElement ordEn = driver.FindElement(By.XPath("//span[.='will']"));
-
-                    IWebElement slippFeltEn = driver.FindElements(By.ClassName("droptarget"))[0]; 
-
-                    // TODO:
-                    // dra ord inn i felter
-                    // Actions drag: Fungerer ikke med safari-driver
-                    // Assert Resultat
-                    // Klikk begynn på nytt
-                    // Håndter lukking av popup for å avslutte
-                    // Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
-
-                    LoggUt();
-                } catch (Exception exception)
-                {
-                    HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
-                }
+                Assert.Ignore(); // Skal kun testes på Stage
             }
-        } 
+
+            try
+            {
+                GaaTilSkoleDigilaer();
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+
+                GaaTilSeleniumFag();
+                
+                driver.FindElement(By.XPath("//span[starts-with(., '1 Tall og siffer')]")).Click();
+                HaandterMacSafari();
+
+                if(driver.FindElements(By.XPath("//button[.='Fortsett med forrige forsøk']")).Count > 0)
+                {
+                    driver.FindElement(By.XPath("//button[.='Fortsett med forrige forsøk']")).Click();
+                } else if(driver.FindElements(By.XPath("//button[.='Ta quizen nå']")).Count > 0) {
+                    driver.FindElement(By.XPath("//button[.='Ta quizen nå']")).Click();
+                } else {
+                    driver.FindElement(By.XPath("//button[.='Fortsett siste forhåndsvisning']")).Click();
+                }
+
+                HaandterMacSafari();
+                IWebElement ordEn = driver.FindElement(By.XPath("//span[.='will']"));
+
+                IWebElement slippFeltEn = driver.FindElements(By.ClassName("droptarget"))[0]; 
+
+                // TODO:
+                // dra ord inn i felter
+                // Actions drag: Fungerer ikke med safari-driver
+                // Assert Resultat
+                // Klikk begynn på nytt
+                // Håndter lukking av popup for å avslutte
+                // Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
+
+                LoggUt();
+            } catch (Exception exception)
+            {
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+            }
+        }
 
         [Test]
         [TestCase(TestName = "Test Trinket regnestykke")]
         public void TestTrinket()
         {
-            if(GlobalVariables.ErStage()) // Skal kun testes på Stage
+            if(GlobalVariables.ErProd())
             {
-                try
+                Assert.Ignore(); // Skal kun testes på Stage
+            }
+            
+            try
+            {
+                GaaTilSkoleDigilaer();
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+
+                GaaTilSeleniumFag();
+                driver.FindElement(By.XPath("//span[starts-with(., 'Trinket')]")).Click();
+                HaandterMacSafari();
+
+                if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
                 {
-                    GaaTilSkoleDigilaer();
-                    LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                    IWebElement iFrameTrinket = driver.FindElement(By.TagName("iframe"));
 
-                    GaaTilSeleniumFag();
-                    driver.FindElement(By.XPath("//span[starts-with(., 'Trinket')]")).Click();
-                    HaandterMacSafari();
+                    Assert.IsTrue(iFrameTrinket.Displayed);
 
-                    if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
-                    {
-                        IWebElement iFrameTrinket = driver.FindElement(By.TagName("iframe"));
-
-                        Assert.IsTrue(iFrameTrinket.Displayed);
-
-                        // driver.SwitchTo().Frame(iFrameVimeo); // Fungerer ikke på automatisert iPad
-                        Thread.Sleep(5000);
-                        Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
-                    } else
-                    {
-                        IWebElement iFrameTrinket = driver.FindElement(By.TagName("iframe"));
-                        Assert.IsTrue(iFrameTrinket.Displayed);
-                        driver.SwitchTo().Frame(iFrameTrinket);
-                        Thread.Sleep(5000); 
-                        Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
-
-                        driver.FindElement(By.ClassName("run-it")).Click();
-                        Thread.Sleep(4000); 
-
-                    // TODO Sende tall: InputSimulator funker ikke
-                    //  InputSimulator sim = new InputSimulator();
-                    //  Thread.Sleep(5000); 
-                    //  sim.Keyboard.TextEntry("4");
-                    //  Thread.Sleep(5000); 
-                    //  sim.Keyboard.TextEntry("4");
-
-                        IWebElement inputFelt = driver.FindElement(By.Id("honeypot"));
-                        inputFelt.SendKeys("4+2");
-                        Thread.Sleep(5000); 
-
-                        // MouseHook m;
-                        //  Actions action = new Actions(driver); 
-                        // action.SendKeys("4").Perform();
-                        //action.KeyDown("4").sendKeys(String.valueOf('\u0061')).perform();
-                        
-                        Thread.Sleep(1000); 
-                        inputFelt.SendKeys(Keys.Enter);
-                        Thread.Sleep(1000); 
-                        // Console.WriteLine(driver.PageSource.ToLower());
-
-                        driver.SwitchTo().ParentFrame();
-                        Thread.Sleep(1000);
-                    }
-
-                    LoggUt();
-                } catch (Exception exception)
+                    // driver.SwitchTo().Frame(iFrameVimeo); // Fungerer ikke på automatisert iPad
+                    Thread.Sleep(5000);
+                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
+                } else
                 {
-                    HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                    IWebElement iFrameTrinket = driver.FindElement(By.TagName("iframe"));
+                    Assert.IsTrue(iFrameTrinket.Displayed);
+                    driver.SwitchTo().Frame(iFrameTrinket);
+                    Thread.Sleep(5000); 
+                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
+
+                    driver.FindElement(By.ClassName("run-it")).Click();
+                    Thread.Sleep(4000); 
+
+                // TODO Sende tall: InputSimulator funker ikke
+                //  InputSimulator sim = new InputSimulator();
+                //  Thread.Sleep(5000); 
+                //  sim.Keyboard.TextEntry("4");
+                //  Thread.Sleep(5000); 
+                //  sim.Keyboard.TextEntry("4");
+
+                    IWebElement inputFelt = driver.FindElement(By.Id("honeypot"));
+                    inputFelt.SendKeys("4+2");
+                    Thread.Sleep(5000); 
+
+                    // MouseHook m;
+                    //  Actions action = new Actions(driver); 
+                    // action.SendKeys("4").Perform();
+                    //action.KeyDown("4").sendKeys(String.valueOf('\u0061')).perform();
+                    
+                    Thread.Sleep(1000); 
+                    inputFelt.SendKeys(Keys.Enter);
+                    Thread.Sleep(1000); 
+                    // Console.WriteLine(driver.PageSource.ToLower());
+
+                    driver.SwitchTo().ParentFrame();
+                    Thread.Sleep(1000);
                 }
+
+                LoggUt();
+            } catch (Exception exception)
+            {
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
@@ -708,47 +714,49 @@ namespace TestSuite
         [TestCase(TestName = "Test Vimeo avspilling")]
         public void TestVimeoAvspilling()
         {
-            if(GlobalVariables.ErStage()) // Skal kun testes på Stage
+            if(GlobalVariables.ErProd())
             {
-                try
+                Assert.Ignore(); // Skal kun testes på Stage
+            }
+            
+            try
+            {
+                GaaTilSkoleDigilaer();
+                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+
+                GaaTilSeleniumFag();
+                
+                driver.FindElement(By.XPath("//span[starts-with(., 'Vimeo')]")).Click();
+                HaandterMacSafari();
+                if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
                 {
-                    GaaTilSkoleDigilaer();
-                    LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                    IWebElement iFrameVimeo = driver.FindElement(By.TagName("iframe"));
 
-                    GaaTilSeleniumFag();
-                    
-                    driver.FindElement(By.XPath("//span[starts-with(., 'Vimeo')]")).Click();
-                    HaandterMacSafari();
-                    if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
-                    {
-                        IWebElement iFrameVimeo = driver.FindElement(By.TagName("iframe"));
+                    Assert.IsTrue(iFrameVimeo.Displayed);
 
-                        Assert.IsTrue(iFrameVimeo.Displayed);
-
-                        // driver.SwitchTo().Frame(iFrameVimeo); // Fungerer ikke på automatisert iPad
-                        Thread.Sleep(5000);
-                        Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
-                    } else
-                    {
-                        IWebElement iFrameVimeo = driver.FindElement(By.TagName("iframe"));
-                        Assert.IsTrue(iFrameVimeo.Displayed);
-                        driver.SwitchTo().Frame(iFrameVimeo);
-                        Thread.Sleep(1000); 
-                        Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
-
-                        driver.FindElement(By.ClassName("state-paused")).Click();
-                        Thread.Sleep(10000); // La video snurre litt
-                        driver.FindElement(By.ClassName("state-playing")).Click();
-
-                        driver.SwitchTo().ParentFrame();
-                        Thread.Sleep(1000);
-                    }
-
-                    LoggUt();
-                } catch (Exception exception)
+                    // driver.SwitchTo().Frame(iFrameVimeo); // Fungerer ikke på automatisert iPad
+                    Thread.Sleep(5000);
+                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
+                } else
                 {
-                    HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
+                    IWebElement iFrameVimeo = driver.FindElement(By.TagName("iframe"));
+                    Assert.IsTrue(iFrameVimeo.Displayed);
+                    driver.SwitchTo().Frame(iFrameVimeo);
+                    Thread.Sleep(1000); 
+                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
+
+                    driver.FindElement(By.ClassName("state-paused")).Click();
+                    Thread.Sleep(10000); // La video snurre litt
+                    driver.FindElement(By.ClassName("state-playing")).Click();
+
+                    driver.SwitchTo().ParentFrame();
+                    Thread.Sleep(1000);
                 }
+
+                LoggUt();
+            } catch (Exception exception)
+            {
+                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
 
