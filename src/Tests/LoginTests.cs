@@ -186,10 +186,13 @@ namespace TestSuite
                     "debuginfo: " + debugInfo);
                 }
 
-                MonitorApiClient.PostTestkjoring(new Testkjoring{
-                    enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
-                    starttid = teststartForDB, sluttid = DateTime.Now,
-                    debugInformasjon = ""});
+                if((int)TestContext.CurrentContext.Result.Outcome.Status != 1) // Lagrer ikke skippede/ignorerte tester i DB
+                {
+                    MonitorApiClient.PostTestkjoring(new Testkjoring{
+                        enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
+                        starttid = teststartForDB, sluttid = DateTime.Now,
+                        debugInformasjon = ""});
+                }
                  
                 if((int)TestContext.CurrentContext.Result.Outcome.Status == 4) // TEMP logging ifbm feilsøking både nedenfor og over
                 {
