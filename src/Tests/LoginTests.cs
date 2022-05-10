@@ -67,7 +67,7 @@ namespace TestSuite
                 bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Safari", browserVersion = "14.1", resolution = "1920x1080"};
             } else if(deviceConfig == DeviceConfig.OSXBigSurFirefox)
             {
-                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Firefox", browserVersion = "92.0", resolution = "1920x1080"};
+                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Firefox", browserVersion = "99.0", resolution = "1920x1080"};
             } else if(deviceConfig == DeviceConfig.OSXBigSurChrome)
             {
                 bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Chrome", browserVersion = "latest", resolution = "1920x1080"};
@@ -153,6 +153,12 @@ namespace TestSuite
                     resultatTekst += "\nKanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
                 }
                 ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");
+            } else if(TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Warning) 
+            {
+                resultatTekst = oppsettTekst + ":\n"
+                + ":white_check_mark:" + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
+                + resultatTekst;
+                ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");
             } else
             {
                 resultatTekst = oppsettTekst + ":\n"
@@ -178,13 +184,6 @@ namespace TestSuite
                     debugInfo = debugInfo.Substring(0, 300) + "[stripped]" + debugInfo.Substring(debugInfo.Length - 700, 700);
                     Console.WriteLine("Debuginfo kuttet:\n " + debugInfo);
                 }
-                if((int)TestContext.CurrentContext.Result.Outcome.Status == 4) // TEMP logging ifbm feilsøking både nedenfor og over.
-                {
-                    Console.WriteLine("Sender feilet test til db: " + "Enhet-id: " + enhetIdForDB + 
-                    " funktestid: " +  funkTestIdForDB +
-                    " teststartForDB: " +  teststartForDB +
-                    "debuginfo: " + debugInfo);
-                }
 
                 if((int)TestContext.CurrentContext.Result.Outcome.Status != 1) // Lagrer ikke skippede/ignorerte tester i DB
                 {
@@ -194,7 +193,7 @@ namespace TestSuite
                         debugInformasjon = ""});
                 }
                  
-                if((int)TestContext.CurrentContext.Result.Outcome.Status == 4) // TEMP logging ifbm feilsøking både nedenfor og over
+                if((int)TestContext.CurrentContext.Result.Outcome.Status == 4)
                 {
                     Console.WriteLine("Sendt feilet test til db: " + "Enhet-id: " + enhetIdForDB + 
                     " funktestid: " +  funkTestIdForDB +
@@ -203,7 +202,10 @@ namespace TestSuite
                 }
             }
 
-            if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed))
+            if((int)TestContext.CurrentContext.Result.Outcome.Status == 3)
+            {
+                resultatTekst += ":warning:'"  + TestContext.CurrentContext.Test.Name +  "' fungerte etter retry.\n";
+            } else if (TestContext.CurrentContext.Result.Outcome.Status.Equals(TestStatus.Passed))
             {
                 // Utkommentert for å ikke overfylle slack kanalen etter kjøring. Fokus på evt feilede tester heller.
                 // resultatTekst += ":white_check_mark:" + TestContext.CurrentContext.Test.Name + "\n";
@@ -396,8 +398,7 @@ namespace TestSuite
                     IWebElement iFrameZoom = driver.FindElement(By.Id("contentframe"));
 
                     Assert.IsTrue(iFrameZoom.Displayed);
-
-                    // driver.SwitchTo().Frame(iFrameZoom); // Fungerer ikke på automatisert iPad
+                    // Gå inn på iFrame fungerer ikke på automatisert iPad
 
                     Thread.Sleep(5000); // spinner i zoom...
 
@@ -460,6 +461,11 @@ namespace TestSuite
         [TestCase(TestName = "AdobeConnect som lærer")]
         public void TestAdobeConnectLaerer()
         {
+            if(GlobalVariables.ErStage())  // TODO JB: Midlertidig inntil testbruker fikses på stage
+            {
+                Assert.Ignore();
+            }
+
             try
             {
                 TestAdobeConnect(facultyEmployeeLaererFnr);
@@ -474,11 +480,28 @@ namespace TestSuite
             GaaTilSkoleDigilaer();
             LoggInnMedFeide(fnr, feidePw);
             GaaTilSeleniumFag();
+            int retries = 0; // For adobeconnect-hikke
+            string moteUrl = null;
 
-            string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
-            driver.Navigate().GoToUrl(adobeConnectUrl);
+            while(moteUrl == null && retries < 5)
+            {                
+                string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
+                driver.Navigate().GoToUrl(adobeConnectUrl);
 
-            string moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
+                try
+                {
+                    moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
+                } catch(Exception e)
+                {
+                    retries++;
+                    Thread.Sleep(15000);
+                }
+            }
+            if(retries > 0)
+            {
+                Assert.Warn("Adobeconnect test gikk videre etter retry");
+            }
+
             int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
             moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
             driver.Navigate().GoToUrl(moteUrl);
@@ -815,7 +838,7 @@ namespace TestSuite
                driver.FindElement(By.XPath("//button[@type='submit']")).Click(); 
                HaandterMacSafari();
             }
-
+            Thread.Sleep(5000); // Lar systemet få logge bruker inn
             driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             
             HaandterMacSafari();
