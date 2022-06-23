@@ -39,9 +39,10 @@ namespace TestSuite
         private BrowserStackCapabilities bsCaps;
         private string fagkodeSelenium = "SEL";
         private string facultyEmployeeLaererFnr = System.Environment.GetEnvironmentVariable("DIGI_USER_FACULTY");
+        private string facultyEmployeeLaererPW = System.Environment.GetEnvironmentVariable("DIGI_USER_FACULTY_PW");
         // private string tittelTBD = "fra properties"; // TODO: Dobbeltsjekk rolle: Trengs student over 18 eller en lærer til?
         private string studentUnder18Fnr = System.Environment.GetEnvironmentVariable("DIGI_ELEV_UNDER_ATTEN");
-        private string feidePw = System.Environment.GetEnvironmentVariable("DIGI_FEIDE_PW");
+        private string studentUnder18FnrPW = System.Environment.GetEnvironmentVariable("DIGI_ELEV_UNDER_ATTEN_PW");
         private string resultatTekst = "";
         private int enhetIdForDB;
         private int funkTestIdForDB;
@@ -106,6 +107,7 @@ namespace TestSuite
             }
 
          //  driver = seleniumSetup.GetFirefoxDriver(); GlobalVariables.setStage(); /  GlobalVariables.setProd(); // For lokal debug evt
+         //  driver = seleniumSetup.GetFirefoxDriver(); 
              driver = seleniumSetup.GetBrowserstackDriver(bsCaps);
         }
 
@@ -297,7 +299,7 @@ namespace TestSuite
             try
             {
                 GaaTilDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
 
                 LoggUt();
             } catch(Exception exception)
@@ -314,7 +316,7 @@ namespace TestSuite
 			{
                 GaaTilSkoleDigilaer();
                 HaandterMacSafari();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
                 LoggUt();
             } catch (Exception exception)
             {
@@ -329,7 +331,7 @@ namespace TestSuite
             try
 			{
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
+                LoggInnMedFeide(facultyEmployeeLaererFnr, facultyEmployeeLaererPW);
                 LoggUt();
             } catch (Exception exception)
             {
@@ -344,7 +346,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
 
                 GaaTilSeleniumFag();
                 string pageSource = driver.PageSource;
@@ -365,7 +367,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
 
                 GaaTilSeleniumFag();
 
@@ -386,7 +388,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
                 GaaTilSeleniumFag();
 
                 driver.FindElement(By.XPath("//span[contains(text(), 'SELENIUM test av Zoom')]")).Click();
@@ -440,7 +442,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(facultyEmployeeLaererFnr, feidePw);
+                LoggInnMedFeide(facultyEmployeeLaererFnr, facultyEmployeeLaererPW);
                 GaaTilSeleniumFag();
 
                 driver.FindElement(By.XPath("//button[.='Slå redigering på']")).Click();
@@ -468,17 +470,17 @@ namespace TestSuite
 
             try
             {
-                TestAdobeConnect(facultyEmployeeLaererFnr);
+                TestAdobeConnect(facultyEmployeeLaererFnr, facultyEmployeeLaererPW);
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
         
-        private void TestAdobeConnect(string fnr)
+        private void TestAdobeConnect(string fnr, string pw)
         {
             GaaTilSkoleDigilaer();
-            LoggInnMedFeide(fnr, feidePw);
+            LoggInnMedFeide(fnr, pw);
             GaaTilSeleniumFag();
             int retries = 0; // For adobeconnect-hikke
             string moteUrl = null;
@@ -515,7 +517,7 @@ namespace TestSuite
 
                 driver.SwitchTo().Frame(iFrameAdobe);
                 String source = driver.PageSource;
-                Assert.True(source.Contains("attendeePodContainerDiv"), "Siden inneholder ikke attendeePodContainerDiv");
+                Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
 
                 if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
                 {
@@ -532,8 +534,8 @@ namespace TestSuite
                     driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
                 }
 
-                Assert.True(driver.FindElement(By.Id("attendeePodContainerDiv")).Displayed, "Div for deltakere ikke funnet (attendeePodContainerDiv)");
-
+                Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
+                
                 driver.SwitchTo().ParentFrame();
             } else // Mobiler/tablets krever egen app. Gjør kun en assert:
             {
@@ -552,7 +554,7 @@ namespace TestSuite
         {
             try
             {
-                TestAdobeConnect(studentUnder18Fnr);
+                TestAdobeConnect(studentUnder18Fnr, studentUnder18FnrPW);
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -563,7 +565,8 @@ namespace TestSuite
         [TestCase(TestName = "Test Poodl MiniLesson diktat")]
         public void TestPoodlMinilessonDiktat()
         {
-            if(GlobalVariables.ErProd())
+            if(GlobalVariables.ErProd() || (bsCaps.device != null && 
+                (bsCaps.device.Contains("iPad") || bsCaps.device.Contains("iPhone") || bsCaps.device.Contains("Pixel 4") || bsCaps.device.Contains("OnePlus 9") || bsCaps.device.Contains("Galaxy S21"))))
             {
                 Assert.Ignore(); // Skal kun testes på Stage
             }
@@ -571,7 +574,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
 
                 GaaTilSeleniumFag();
                 
@@ -630,7 +633,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
 
                 GaaTilSeleniumFag();
                 
@@ -670,7 +673,7 @@ namespace TestSuite
         [TestCase(TestName = "Test Trinket regnestykke")]
         public void TestTrinket()
         {
-            if(GlobalVariables.ErProd())
+            if(GlobalVariables.ErProd() || (bsCaps.device != null && bsCaps.device.Contains("iPhone")))
             {
                 Assert.Ignore(); // Skal kun testes på Stage
             }
@@ -678,7 +681,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
 
                 GaaTilSeleniumFag();
                 driver.FindElement(By.XPath("//span[starts-with(., 'Trinket')]")).Click();
@@ -740,7 +743,7 @@ namespace TestSuite
         [TestCase(TestName = "Test Vimeo avspilling")]
         public void TestVimeoAvspilling()
         {
-            if(GlobalVariables.ErProd())
+            if(GlobalVariables.ErProd() || (bsCaps.device != null && bsCaps.device.Contains("iPhone")))
             {
                 Assert.Ignore(); // Skal kun testes på Stage
             }
@@ -748,7 +751,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, feidePw);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
 
                 GaaTilSeleniumFag();
                 
@@ -819,10 +822,8 @@ namespace TestSuite
             if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
             {
                 IWebElement orgSelector = driver.FindElement(By.Id("org_selector_filter"));
-                orgSelector.SendKeys("Feide"); // For testing mot dataporten bruk "Tjenesteleverandør"
-  
-                driver.FindElement(By.XPath("//span[.='Feide']")).Click();
-
+                orgSelector.SendKeys("Utdanningsdirektoratet - systemorganisasjon"); // For testing mot dataporten bruk "Tjenesteleverandør"
+                driver.FindElement(By.XPath("//span[.='Utdanningsdirektoratet - systemorganisasjon']")).Click();
                 driver.FindElement(By.Id("selectorg_button")).Click();
             }
 
@@ -841,6 +842,8 @@ namespace TestSuite
             Thread.Sleep(5000); // Lar systemet få logge bruker inn
             driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             
+            HaandterSamtykke();
+
             HaandterMacSafari();
             Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
         }
@@ -919,6 +922,21 @@ namespace TestSuite
             if(bsCaps.os != null && (bsCaps.os.Equals("Windows") || bsCaps.os.Equals("OS X")))
             {
                 driver.Manage().Window.Maximize();
+            }
+        }
+
+        private void HaandterSamtykke()
+        {
+            
+            if(driver.PageSource.ToLower().Contains("godta samtykke"))
+            {
+                driver.FindElement(By.XPath("//input[navn='status10']")).Click();
+                driver.FindElement(By.XPath("//button[@type='submit']")).Click();
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+            }
+            if(driver.FindElements(By.XPath("//button[text='Avslutt veileder']")).Count > 0)
+            {
+                driver.FindElement(By.XPath("//button[text='Avslutt veileder']")).Click();
             }
         }
 

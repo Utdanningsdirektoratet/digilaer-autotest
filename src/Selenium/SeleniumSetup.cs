@@ -88,6 +88,10 @@ namespace Selenium
             {
                 nameString += ", " + bsCaps.resolution;
             }
+            if(nameString.Equals(""))
+            {
+                nameString = "Lokal Windows med Firefox";
+            }
             return nameString;
         }
 
