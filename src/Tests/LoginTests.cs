@@ -537,9 +537,9 @@ namespace TestSuite
                 Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
                 
                 driver.SwitchTo().ParentFrame();
-            } else // Mobiler/tablets krever egen app. Gjør kun en assert:
+            } else
             {
-                Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));
+                // TODO: Implementer hvis støttet fra driver 
             }
             driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             HaandterAlert();
