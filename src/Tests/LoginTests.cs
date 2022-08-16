@@ -40,9 +40,10 @@ namespace TestSuite
         private string fagkodeSelenium = "SEL";
         private string facultyEmployeeLaererFnr = System.Environment.GetEnvironmentVariable("DIGI_USER_FACULTY");
         private string facultyEmployeeLaererPW = System.Environment.GetEnvironmentVariable("DIGI_USER_FACULTY_PW");
-        // private string tittelTBD = "fra properties"; // TODO: Dobbeltsjekk rolle: Trengs student over 18 eller en lærer til?
         private string studentUnder18Fnr = System.Environment.GetEnvironmentVariable("DIGI_ELEV_UNDER_ATTEN");
-        private string studentUnder18FnrPW = System.Environment.GetEnvironmentVariable("DIGI_ELEV_UNDER_ATTEN_PW");
+        private string studentUnder18PW = System.Environment.GetEnvironmentVariable("DIGI_ELEV_UNDER_ATTEN_PW");
+        private string studentOver18Fnr = System.Environment.GetEnvironmentVariable("DIGI_ELEV_OVER_ATTEN");
+        private string studentOver18PW = System.Environment.GetEnvironmentVariable("DIGI_ELEV_OVER_ATTEN_PW");
         private string resultatTekst = "";
         private int enhetIdForDB;
         private int funkTestIdForDB;
@@ -299,7 +300,7 @@ namespace TestSuite
             try
             {
                 GaaTilDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
 
                 LoggUt();
             } catch(Exception exception)
@@ -316,7 +317,7 @@ namespace TestSuite
 			{
                 GaaTilSkoleDigilaer();
                 HaandterMacSafari();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
                 LoggUt();
             } catch (Exception exception)
             {
@@ -346,7 +347,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentOver18Fnr, studentOver18PW);
 
                 GaaTilSeleniumFag();
                 string pageSource = driver.PageSource;
@@ -367,8 +368,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
-
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
                 GaaTilSeleniumFag();
 
                 ReadOnlyCollection<IWebElement> redigeringsknapp = driver.FindElements(By.XPath("//button[.='Slå redigering på']"));
@@ -388,7 +388,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
                 GaaTilSeleniumFag();
 
                 driver.FindElement(By.XPath("//span[contains(text(), 'SELENIUM test av Zoom')]")).Click();
@@ -554,7 +554,7 @@ namespace TestSuite
         {
             try
             {
-                TestAdobeConnect(studentUnder18Fnr, studentUnder18FnrPW);
+                TestAdobeConnect(studentUnder18Fnr, studentUnder18PW);
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -574,7 +574,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
 
                 GaaTilSeleniumFag();
                 
@@ -633,7 +633,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
 
                 GaaTilSeleniumFag();
                 
@@ -681,7 +681,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
 
                 GaaTilSeleniumFag();
                 driver.FindElement(By.XPath("//span[starts-with(., 'Trinket')]")).Click();
@@ -751,7 +751,7 @@ namespace TestSuite
             try
             {
                 GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18FnrPW);
+                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
 
                 GaaTilSeleniumFag();
                 
@@ -927,13 +927,14 @@ namespace TestSuite
 
         private void HaandterSamtykke()
         {
-            
             if(driver.PageSource.ToLower().Contains("godta samtykke"))
             {
                 driver.FindElement(By.XPath("//input[navn='status10']")).Click();
                 driver.FindElement(By.XPath("//button[@type='submit']")).Click();
                 driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             }
+            // Verken avslutt veileder eller klikke neste knapp fungerer skikkelig i Selenium
+            // Vurdere evt tab klikk x3 + Enter ? 
             if(driver.FindElements(By.XPath("//button[text='Avslutt veileder']")).Count > 0)
             {
                 driver.FindElement(By.XPath("//button[text='Avslutt veileder']")).Click();
