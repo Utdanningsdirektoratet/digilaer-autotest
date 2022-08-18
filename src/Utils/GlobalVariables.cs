@@ -23,8 +23,13 @@ namespace Utils
         {
             return miljo == Miljo.Stage;
         }
+        
+        public static bool ErTest()
+        {
+            return miljo == Miljo.Test;
+        }
 
-        public static void SetStage()
+        public static void SetStageEnv()
         {
             GlobalVariables.miljo = Miljo.Stage;
             GlobalVariables.digilaerUrl = "https://digilaer-cms-stage.udir.c.bitbit.net"; 
@@ -32,17 +37,25 @@ namespace Utils
             GlobalVariables.loggTilDatabase = false;
         }
 
-        public static void SetProd()
+        public static void SetProdEnv()
         {
             GlobalVariables.miljo = Miljo.Prod;
             GlobalVariables.digilaerUrl = "https://digilaer.no";
             GlobalVariables.digilaerSkoleUrl = "https://skole.digilaer.no";
-            GlobalVariables.loggTilDatabase =   System.Environment.GetEnvironmentVariable("DIGI_LOGG_TIL_DB").Equals("true");
+            GlobalVariables.loggTilDatabase = System.Environment.GetEnvironmentVariable("DIGI_LOGG_TIL_DB").Equals("true");
+        }
+
+        public static void SetTestEnv()
+        {
+            GlobalVariables.miljo = Miljo.Test;
+            GlobalVariables.digilaerUrl = "https://moodle-test.udir.c.bitbit.net";
+            GlobalVariables.loggTilDatabase =   false;
         }
     }
 
     public enum Miljo
     {
+        Test,
         Stage,
         Prod
     }

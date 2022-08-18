@@ -226,11 +226,11 @@ namespace TestSuite
             try
             {
                 GaaTilDigilaer();
-                ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.ClassName("page__content"));
-                Assert.That(sideelementer.Count, Is.GreaterThan(0));
 
-                sideelementer = driver.FindElements(By.ClassName("layout"));
-                Assert.That(sideelementer.Count, Is.GreaterThan(0));
+                String kildekode = driver.PageSource.ToLower();
+
+                Assert.That(kildekode.Contains("plattform"), Is.True);
+                Assert.That(kildekode.Contains("digilær"), Is.True);
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -277,17 +277,17 @@ namespace TestSuite
             {
                 GaaTilSkoleDigilaer();
 
-                ReadOnlyCollection<IWebElement> sideelementer = driver.FindElements(By.Id("page"));
-                Assert.That(sideelementer.Count, Is.GreaterThan(0));
+                String kildekode = driver.PageSource.ToLower();
 
-                sideelementer = driver.FindElements(By.ClassName("card-body"));
-                Assert.That(sideelementer.Count, Is.GreaterThan(0));
+                Assert.That(kildekode.Contains("plattform"), Is.True);
+                Assert.That(kildekode.Contains("digilær"), Is.True);
+
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
- 
+
         [Test]
         [TestCase(TestName = "Elev kan logge på med Feide via digilaer.no")]
         public void LoggInnOgUtAvDigilaerMedFeide()
@@ -382,60 +382,6 @@ namespace TestSuite
         }
 
         [Test]
-        [TestCase(TestName = "Last Zoom-side")]
-        public void TestZoom()
-        {
-            try
-            {
-                GaaTilSkoleDigilaer();
-                LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
-                GaaTilSeleniumFag();
-
-                driver.FindElement(By.XPath("//span[contains(text(), 'SELENIUM test av Zoom')]")).Click();
-
-                Thread.Sleep(5000); // Load spinner i zoom...
-
-                if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
-                {
-                    IWebElement iFrameZoom = driver.FindElement(By.Id("contentframe"));
-
-                    Assert.IsTrue(iFrameZoom.Displayed);
-                    // Gå inn på iFrame fungerer ikke på automatisert iPad
-
-                    Thread.Sleep(5000); // spinner i zoom...
-
-                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed); // TODO: Forsøk å teste noe mer rundt zoom... denne treffer trolig kun toppen av html...
-                } else if(driver.Url.Contains(GlobalVariables.digilaerSkoleUrl))
-                {
-                    IWebElement iFrameZoom = driver.FindElement(By.Id("contentframe"));
-
-                    Assert.IsTrue(iFrameZoom.Displayed);
-
-                    driver.SwitchTo().Frame(iFrameZoom);
-
-                    Thread.Sleep(5000); // spinner i zoom...
-
-                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
-                    // TODO: Test evt noe mer her:
-                    // Assert.IsTrue(driver.FindElement(By.Id("@integration-meeting-list")).Displayed);
-                    // Assert.Greater(driver.FindElements(By.XPath("//a[text(), 'Join']")).Count, 0, "Forventet at det skulle være minst 1 Join-knapp");
-
-                    driver.SwitchTo().ParentFrame();
-                } else
-                { // Mobil device har selve zoom lastet i stedet for en iFrame
-                    Thread.Sleep(5000); // spinner i Zoom
-                    Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
-                }
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
-                HaandterMacSafari();
-                LoggUt();
-            } catch(Exception exception)
-            {
-                HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
-            }
-        }
-
-        [Test]
         [TestCase(TestName = "Lærer kan redigere fag")]
         public void TestAtLaererKanRedigereFag()
         {
@@ -444,11 +390,13 @@ namespace TestSuite
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(facultyEmployeeLaererFnr, facultyEmployeeLaererPW);
                 GaaTilSeleniumFag();
+                driver.FindElement(By.LinkText("Kurs")).Click();
 
                 driver.FindElement(By.XPath("//button[.='Slå redigering på']")).Click();
-                HaandterMacSafari();
-                ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//a[@aria-label='Rediger']"));
-                Assert.That(redigerknapper.Count, Is.GreaterThan(6));
+                Thread.Sleep(3000); // HaandterMacSafari();
+                // TODO: Fix sjekk:
+                // ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//a[@aria-label='Rediger']"));
+                // Assert.That(redigerknapper.Count, Is.GreaterThan(6));
 
                 driver.FindElement(By.XPath("//button[.='Slå redigering av']")).Click();
 
@@ -534,12 +482,24 @@ namespace TestSuite
                     driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
                 }
 
+                if(driver.FindElements(By.Id("productMaintenanceNotifier_1")).Count > 0 && driver.FindElement(By.Id("productMaintenanceNotifier_1")).Displayed)
+                {
+                    driver.FindElement(By.Id("productMaintenanceNotifier_1")).Click();
+                }
+
                 Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
                 
                 driver.SwitchTo().ParentFrame();
             } else
             {
-                // TODO: Implementer hvis støttet fra driver 
+                // TODO: Implementer hvis støttet fra driver:
+        //         Thread.Sleep(10000);
+        //         if(driver.FindElements(By.XPath("//*[text='Open in Browser']")).Count > 0) {
+        //             driver.FindElement(By.XPath("//*[text='Open in Browser']")).Click();
+        //             Thread.Sleep(10000);
+        //         } else {
+        //             Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));       
+        //         }
             }
             driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             HaandterAlert();
@@ -840,9 +800,11 @@ namespace TestSuite
                HaandterMacSafari();
             }
             Thread.Sleep(5000); // Lar systemet få logge bruker inn
-            driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             
-            HaandterSamtykke();
+            if(GlobalVariables.ErProd()) {
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+                HaandterSamtykke();
+            }
 
             HaandterMacSafari();
             Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
@@ -855,7 +817,7 @@ namespace TestSuite
             AapneBrukerMeny();
 
             HaandterMacSafari();
-            driver.FindElement(By.XPath("//span[.='Logg ut']")).Click();
+            driver.FindElement(By.LinkText("Logg ut")).Click();
             HaandterMacSafari();
         }
 
@@ -899,21 +861,10 @@ namespace TestSuite
         private void GaaTilSeleniumFag()
         {
             HaandterMacSafari();
-
-            IWebElement hamburgerButton = driver.FindElement(By.XPath("//button[@data-action='toggle-drawer']"));
-
-            if(hamburgerButton.GetAttribute("aria-expanded").Equals("false"))
-            {
-                hamburgerButton.Click();
-            }
-
-            ReadOnlyCollection<IWebElement> merKnapper = driver.FindElements(By.XPath("//a[@data-key='courseindexpage']"));
-            if(merKnapper.Count > 0)
-            {
-                merKnapper[0].Click();
-            }
-
-            driver.FindElement(By.XPath("//span[.='" + fagkodeSelenium + "']")).Click();
+            AapneBrukerMeny();
+            driver.FindElement(By.LinkText("Profil")).Click();
+            Thread.Sleep(5000); // TODO: Vurder om nødvendig... 
+            driver.FindElement(By.LinkText("Selenium")).Click();
             HaandterMacSafari();
         }
 
@@ -974,6 +925,7 @@ namespace TestSuite
 
         private void HaandterFeiletTest(Exception e, string testnavn)
         {
+            Console.WriteLine(e.StackTrace);
             Printscreen.TakeScreenShot(driver, testnavn);
             LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
             
