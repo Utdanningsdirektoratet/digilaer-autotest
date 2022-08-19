@@ -430,14 +430,13 @@ namespace TestSuite
             GaaTilSkoleDigilaer();
             LoggInnMedFeide(fnr, pw);
             GaaTilSeleniumFag();
+            
+            driver.FindElement(By.LinkText("SELENIUM test Adobe Connect")).Click();
             int retries = 0; // For adobeconnect-hikke
             string moteUrl = null;
 
             while(moteUrl == null && retries < 5)
-            {                
-                string adobeConnectUrl = driver.FindElement(By.XPath("//span[.='SELENIUM test Adobe Connect']/ancestor::a")).GetAttribute("href");
-                driver.Navigate().GoToUrl(adobeConnectUrl);
-
+            {
                 try
                 {
                     moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
@@ -863,8 +862,10 @@ namespace TestSuite
             HaandterMacSafari();
             AapneBrukerMeny();
             driver.FindElement(By.LinkText("Profil")).Click();
-            Thread.Sleep(5000); // TODO: Vurder om nødvendig... 
+            Thread.Sleep(2000); // TODO: Vurder om nødvendig... 
             driver.FindElement(By.LinkText("Selenium")).Click();
+            Thread.Sleep(2000); // TODO: Vurder om nødvendig... 
+            driver.FindElement(By.LinkText("Kurs")).Click();
             HaandterMacSafari();
         }
 
