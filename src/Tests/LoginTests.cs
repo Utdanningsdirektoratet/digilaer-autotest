@@ -23,7 +23,7 @@ namespace TestSuite
     [TestFixture(DeviceConfig.OSXBigSurChrome)]
     [TestFixture(DeviceConfig.OSXBigSurFirefox)]
     [TestFixture(DeviceConfig.OSXBigSurSafari)]
-    [TestFixture(DeviceConfig.IOSIphoneXS)]
+    [TestFixture(DeviceConfig.IOSIphone)]
     [TestFixture(DeviceConfig.Win10Chrome)]
     [TestFixture(DeviceConfig.Win10Firefox)]
     [TestFixture(DeviceConfig.Win10Edge)] 
@@ -79,9 +79,9 @@ namespace TestSuite
             } else if(deviceConfig == DeviceConfig.Ipad11Pro2020)
             {
                 bsCaps = new BrowserStackCapabilities{device = "iPad Pro 11 2020", browser = "Safari", osVersion = "13", realMobile = "true", local = "false"};
-            } else if(deviceConfig == DeviceConfig.IOSIphoneXS)
+            } else if(deviceConfig == DeviceConfig.IOSIphone)
             {
-                bsCaps = new BrowserStackCapabilities{device = "iPhone XS", browser = "Safari", osVersion = "15", realMobile = "true"};
+                bsCaps = new BrowserStackCapabilities{device = "iPhone 13", browser = "Safari", osVersion = "15", realMobile = "true"};
             } else if(deviceConfig == DeviceConfig.AndroidGalaxyTabS7)
             {
                 bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy Tab S7", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
@@ -391,9 +391,9 @@ namespace TestSuite
                 LoggInnMedFeide(facultyEmployeeLaererFnr, facultyEmployeeLaererPW);
                 GaaTilSeleniumFag();
                 driver.FindElement(By.LinkText("Kurs")).Click();
-
+                Thread.Sleep(3000);
                 driver.FindElement(By.XPath("//button[.='Slå redigering på']")).Click();
-                Thread.Sleep(3000); // HaandterMacSafari();
+                Thread.Sleep(5000); // HaandterMacSafari(); // For element stale exception on appium iphone.
                 // TODO: Fix sjekk:
                 // ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//a[@aria-label='Rediger']"));
                 // Assert.That(redigerknapper.Count, Is.GreaterThan(6));

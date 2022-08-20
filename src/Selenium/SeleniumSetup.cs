@@ -139,7 +139,7 @@ namespace Selenium
         OSXBigSurFirefox,
         OSXBigSurChrome,
         OSXBigSurEdge,
-        IOSIphoneXS,
+        IOSIphone,
         Ipad11Pro2020,
         AndroidGalaxyS20,
         AndroidGalaxyTabS7,
