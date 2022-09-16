@@ -40,8 +40,8 @@ namespace Selenium
             capability.AddAdditionalCapability("build", GetBuildString(bsCaps));
             capability.AddAdditionalCapability("browserstack.local", bsCaps.local);
             capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
-            capability.AddAdditionalCapability("browserstack.seleniumLogs", "false");
-            capability.AddAdditionalCapability("browserstack.appiumLogs", "false");
+            capability.AddAdditionalCapability("browserstack.seleniumLogs", "true");
+            capability.AddAdditionalCapability("browserstack.appiumLogs", "true");
             capability.AddAdditionalCapability("browserstack.video", "true");
             capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
             capability.AddAdditionalCapability("browserstack.networkLogs", "false");
@@ -110,7 +110,7 @@ namespace Selenium
         }
 
         /* // For lokal testing evt
-         public IWebDriver GetFirefoxDriver()
+        public IWebDriver GetFirefoxDriver()
         {
             IWebDriver driver = new FirefoxDriver();
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(timeoutSekunder);

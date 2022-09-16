@@ -32,8 +32,8 @@ namespace Utils
         public static void SetStageEnv()
         {
             GlobalVariables.miljo = Miljo.Stage;
-            GlobalVariables.digilaerUrl = "https://digilaer-cms-stage.udir.c.bitbit.net"; 
-            GlobalVariables.digilaerSkoleUrl = "https://moodle-stage.udir.c.bitbit.net";
+            GlobalVariables.digilaerUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
+            GlobalVariables.digilaerSkoleUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
             GlobalVariables.loggTilDatabase = false;
         }
 

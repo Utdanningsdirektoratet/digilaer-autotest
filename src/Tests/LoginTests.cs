@@ -12,6 +12,7 @@ using OpenQA.Selenium.Interactions;
 using Selenium;
 using Slack;
 using Utils;
+using OpenQA.Selenium.Firefox;
 //using WindowsInput;
 
 namespace TestSuite
@@ -108,7 +109,7 @@ namespace TestSuite
             }
 
          //  driver = seleniumSetup.GetFirefoxDriver(); GlobalVariables.setStage(); /  GlobalVariables.setProd(); // For lokal debug evt
-         //  driver = seleniumSetup.GetFirefoxDriver(); 
+           //driver = seleniumSetup.GetFirefoxDriver(); 
              driver = seleniumSetup.GetBrowserstackDriver(bsCaps);
         }
 
@@ -155,19 +156,19 @@ namespace TestSuite
                 {
                     resultatTekst += "\nKanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
                 }
-                ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");
+                if (driver.GetType() != typeof(FirefoxDriver)) {((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"failed\", \"reason\": \" Test feilet. \"}}");}
             } else if(TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Warning) 
             {
                 resultatTekst = oppsettTekst + ":\n"
                 + ":white_check_mark:" + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
                 + resultatTekst;
-                ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");
+                if (driver.GetType() != typeof(FirefoxDriver)) {((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");}
             } else
             {
                 resultatTekst = oppsettTekst + ":\n"
                 + ":white_check_mark:" + "Alle " + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
                 + resultatTekst;
-                ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");
+                if (driver.GetType() != typeof(FirefoxDriver)) {((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");}
             }
 
             SlackClient.CallSlack(resultatTekst);
@@ -229,7 +230,7 @@ namespace TestSuite
 
                 String kildekode = driver.PageSource.ToLower();
 
-                Assert.That(kildekode.Contains("plattform"), Is.True);
+                Assert.That(kildekode.Contains("feide"), Is.True);
                 Assert.That(kildekode.Contains("digilær"), Is.True);
             } catch(Exception exception)
             {
@@ -241,28 +242,58 @@ namespace TestSuite
         [TestCase(TestName = "Målform kan endres")]
         public void TestAtMaalFormKanEndres()
         {
+            if(GlobalVariables.ErStage())
+            {                
+                Assert.Ignore(); // Skip stage siden målform ikke er relevant på startside der
+            }
             try
             {
                 GaaTilDigilaer();
-                if(driver.FindElement(By.Id("language-switcher")).Displayed)
+                
+                if(GlobalVariables.ErProd())
                 {
-                    driver.FindElement(By.Id("language-switcher")).Click();
+                    if(driver.FindElement(By.Id("language-switcher")).Displayed)
+                        {
+                            driver.FindElement(By.Id("language-switcher")).Click();
+                        }
+                        driver.FindElement(By.LinkText("Nynorsk")).Click();
+                } else
+                {
+                    if(driver.FindElement(By.Id("lang-menu-toggle")).Displayed)
+                    {
+                        driver.FindElement(By.Id("lang-menu-toggle")).Click();
+                    }
+                    driver.FindElement(By.PartialLinkText("nynorsk")).Click();
+                }
+                HaandterMacSafari();
+                
+                if(GlobalVariables.ErProd())
+                {
+                    Assert.That(driver.PageSource.ToLower().Contains("moglegheiter"), Is.True);
                 }
 
-                driver.FindElement(By.LinkText("Nynorsk")).Click();
-                HaandterMacSafari();
-                Assert.That(driver.PageSource.ToLower().Contains("moglegheiter"), Is.True);
-
-                if(driver.FindElement(By.Id("language-switcher")).Displayed)
+                if(GlobalVariables.ErProd())
                 {
-                    driver.FindElement(By.Id("language-switcher")).Click();
+                    if(driver.FindElement(By.Id("language-switcher")).Displayed)
+                    {
+                        driver.FindElement(By.Id("language-switcher")).Click();
+                    }
+                    driver.FindElement(By.LinkText("Bokmål")).Click();
+                } else
+                {
+                    if(driver.FindElement(By.Id("lang-menu-toggle")).Displayed)
+                    {
+                        driver.FindElement(By.Id("lang-menu-toggle")).Click();
+                    }
+                    driver.FindElement(By.PartialLinkText("bokmål")).Click();
                 }
 
-                driver.FindElement(By.LinkText("Bokmål")).Click();
                 HaandterMacSafari();
-                Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
-
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl + "/nb/om-digilaerno");
+                if(GlobalVariables.ErProd())
+                {
+                    Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
+                    driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl + "/nb/om-digilaerno");
+                }
             } catch(Exception exception)
             {
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -279,7 +310,7 @@ namespace TestSuite
 
                 String kildekode = driver.PageSource.ToLower();
 
-                Assert.That(kildekode.Contains("plattform"), Is.True);
+                Assert.That(kildekode.Contains("feide"), Is.True);
                 Assert.That(kildekode.Contains("digilær"), Is.True);
 
             } catch(Exception exception)
@@ -411,11 +442,6 @@ namespace TestSuite
         [TestCase(TestName = "AdobeConnect som lærer")]
         public void TestAdobeConnectLaerer()
         {
-            if(GlobalVariables.ErStage())  // TODO JB: Midlertidig inntil testbruker fikses på stage
-            {
-                Assert.Ignore();
-            }
-
             try
             {
                 TestAdobeConnect(facultyEmployeeLaererFnr, facultyEmployeeLaererPW);
@@ -500,7 +526,7 @@ namespace TestSuite
         //             Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));       
         //         }
             }
-            driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+            GaaTilDigilaer();
             HaandterAlert();
             HaandterMacSafari();
 
@@ -538,7 +564,7 @@ namespace TestSuite
                 GaaTilSeleniumFag();
                 
                 // Gå inn på poodl minilesson
-                driver.FindElement(By.XPath("//span[starts-with(., 'Poodll')]")).Click();
+                driver.FindElement(By.XPath("//a[.//span[starts-with(., 'Poodll')]]")).Click();
                 Thread.Sleep(3000);
                 if(driver.FindElements(By.ClassName("btn_finished_attempt")).Count > 0 &&
                         driver.FindElement(By.ClassName("btn_finished_attempt")).Displayed)
@@ -554,17 +580,21 @@ namespace TestSuite
                 Thread.Sleep(500);
                 Assert.True(driver.FindElement(By.ClassName("fa-spinner")).Displayed);
                 Thread.Sleep(10000);
+                 // Mulig at dette kun fungerer på enkelte devicer: Altså at spinner ikke forsvinner:
                 Assert.True(driver.FindElement(By.ClassName("fa-play")).Displayed);
 
                 IWebElement inputFelt = driver.FindElement(By.XPath("//input[@maxlength='6']"));
                 inputFelt.SendKeys("alw");
-                Thread.Sleep(1000);
-                Assert.True(driver.FindElement(By.ClassName("fa-times")).Displayed);
-                Assert.False(driver.FindElement(By.ClassName("fa-check")).Displayed);
+                Thread.Sleep(2000);
+                IWebElement feedback = driver.FindElement(By.ClassName("dictate-feedback"));
+                Assert.True(feedback.GetAttribute("style").Equals("color: red;"));
+                // Assert.True(driver.FindElement(By.ClassName("fa-times")).Displayed);
+                // Assert.False(driver.FindElement(By.ClassName("fa-check")).Displayed);
 
                 inputFelt.SendKeys("ays");
                 Thread.Sleep(1000);
-                Assert.True(driver.FindElements(By.ClassName("fa-check"))[1].Displayed);
+                Assert.True(feedback.GetAttribute("style").Equals("color: green;"));
+                // Assert.True(driver.FindElement(By.ClassName("fa-check")).Displayed);
                 
                 driver.FindElement(By.ClassName("minilesson_nextbutton")).Click();
                 Thread.Sleep(3000);
@@ -596,13 +626,13 @@ namespace TestSuite
 
                 GaaTilSeleniumFag();
                 
-                driver.FindElement(By.XPath("//span[starts-with(., '1 Tall og siffer')]")).Click();
+                driver.FindElement(By.XPath("//a[.//span[starts-with(., '1 Tall og siffer')]]")).Click();
                 HaandterMacSafari();
 
                 if(driver.FindElements(By.XPath("//button[.='Fortsett med forrige forsøk']")).Count > 0)
                 {
                     driver.FindElement(By.XPath("//button[.='Fortsett med forrige forsøk']")).Click();
-                } else if(driver.FindElements(By.XPath("//button[.='Ta quizen nå']")).Count > 0) {
+                } else if(driver.FindElements(By.XPath("//button[.='Ta quizen']")).Count > 0) {
                     driver.FindElement(By.XPath("//button[.='Ta quizen nå']")).Click();
                 } else {
                     driver.FindElement(By.XPath("//button[.='Fortsett siste forhåndsvisning']")).Click();
@@ -641,9 +671,10 @@ namespace TestSuite
             {
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
-
+                
                 GaaTilSeleniumFag();
-                driver.FindElement(By.XPath("//span[starts-with(., 'Trinket')]")).Click();
+                driver.FindElement(By.XPath("//a[.//span[starts-with(., 'Trinket')]]")).Click();
+                // driver.FindElement(By.XPath("//a[starts-with(., 'Trinket')]")).Click();
                 HaandterMacSafari();
 
                 if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
@@ -714,7 +745,7 @@ namespace TestSuite
 
                 GaaTilSeleniumFag();
                 
-                driver.FindElement(By.XPath("//span[starts-with(., 'Vimeo')]")).Click();
+                driver.FindElement(By.XPath("//a[.//span[starts-with(., 'Vimeo')]]")).Click();
                 HaandterMacSafari();
                 if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
                 {
@@ -733,7 +764,7 @@ namespace TestSuite
                     Thread.Sleep(1000); 
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
 
-                    driver.FindElement(By.ClassName("state-paused")).Click();
+                    driver.FindElement(By.ClassName("play-icon")).Click(); // state-paused
                     Thread.Sleep(10000); // La video snurre litt
                     driver.FindElement(By.ClassName("state-playing")).Click();
 
@@ -747,7 +778,7 @@ namespace TestSuite
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
-
+    
         private void LoggInnMedFeide(string brukernavn, string passord)
         {
             HaandterMacSafari();
@@ -758,7 +789,14 @@ namespace TestSuite
                 LogWriter.LogWrite("Logget ut ok");
             }
             HaandterMacSafari();
-            driver.FindElement(By.LinkText("Logg inn")).Click();
+
+            ReadOnlyCollection<IWebElement> loggInnKnapper = driver.FindElements(By.LinkText("Logg inn"));
+            if(loggInnKnapper.Count() <= 2)
+            {
+                loggInnKnapper[loggInnKnapper.Count()-1].Click();
+            } else {
+                loggInnKnapper[2].Click();
+            }
 
             HaandterMacSafari();
 
@@ -770,7 +808,7 @@ namespace TestSuite
             HaandterMacSafari();
             Thread.Sleep(2000);
 
-            if(GlobalVariables.ErStage())
+            if(GlobalVariables.ErTest())
             {
                 driver.FindElement(By.Id("dropdownlist")).Click();
                 driver.FindElements(By.TagName("option"))[1].Click();
@@ -800,13 +838,11 @@ namespace TestSuite
             }
             Thread.Sleep(5000); // Lar systemet få logge bruker inn
             
-            if(GlobalVariables.ErProd()) {
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+                GaaTilDigilaer();
                 HaandterSamtykke();
-            }
 
             HaandterMacSafari();
-            Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
+            Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
         }
 
         private void LoggUt()
@@ -849,7 +885,7 @@ namespace TestSuite
 
         private void GaaTilSkoleDigilaer()
         {
-            driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/?" + sprakUrl);
+            driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl);
             ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("eupopup-button"));
             if(agreeKnappeListe.Count > 0)
             {
@@ -883,7 +919,7 @@ namespace TestSuite
             {
                 driver.FindElement(By.XPath("//input[navn='status10']")).Click();
                 driver.FindElement(By.XPath("//button[@type='submit']")).Click();
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+                GaaTilDigilaer();
             }
             // Verken avslutt veileder eller klikke neste knapp fungerer skikkelig i Selenium
             // Vurdere evt tab klikk x3 + Enter ? 
