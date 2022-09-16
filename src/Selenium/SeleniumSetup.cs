@@ -109,13 +109,13 @@ namespace Selenium
             return buildString;
         }
 
-        /* // For lokal testing evt
+        // For lokal testing evt
         public IWebDriver GetFirefoxDriver()
         {
             IWebDriver driver = new FirefoxDriver();
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(timeoutSekunder);
             return driver;
-        } */
+        }
     }
 
     public class BrowserStackCapabilities

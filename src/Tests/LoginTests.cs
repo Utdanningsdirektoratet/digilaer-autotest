@@ -108,8 +108,7 @@ namespace TestSuite
                 bsCaps = new BrowserStackCapabilities{device = "Google Pixel 4 XL", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
             }
 
-         //  driver = seleniumSetup.GetFirefoxDriver(); GlobalVariables.setStage(); /  GlobalVariables.setProd(); // For lokal debug evt
-           //driver = seleniumSetup.GetFirefoxDriver(); 
+        //   driver = seleniumSetup.GetFirefoxDriver();  // For lokal testing
              driver = seleniumSetup.GetBrowserstackDriver(bsCaps);
         }
 
@@ -790,13 +789,8 @@ namespace TestSuite
             }
             HaandterMacSafari();
 
-            ReadOnlyCollection<IWebElement> loggInnKnapper = driver.FindElements(By.LinkText("Logg inn"));
-            if(loggInnKnapper.Count() <= 2)
-            {
-                loggInnKnapper[loggInnKnapper.Count()-1].Click();
-            } else {
-                loggInnKnapper[2].Click();
-            }
+            IWebElement feideLogin = driver.FindElement(By.ClassName("feide-login"));
+            feideLogin.FindElement(By.LinkText("Logg inn")).Click();
 
             HaandterMacSafari();
 
