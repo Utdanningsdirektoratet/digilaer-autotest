@@ -8,11 +8,8 @@ namespace digilaer_autotest
     {
         static int Main(string[] args)
         {
-            Console.WriteLine("Digilær Autotest start");
-
             if(args != null && args.Length > 0)
             {
-                Console.WriteLine("0 = " + args[0]);
                 if(args[0].Equals("manuell"))
                 {
                     // Manuell kjøring styres med miljøvariabel

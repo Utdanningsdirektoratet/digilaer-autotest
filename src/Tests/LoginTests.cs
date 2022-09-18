@@ -122,7 +122,6 @@ namespace TestSuite
                     enhet = bsCaps.device, nettleserNavn = bsCaps.browser, nettleserVersjon = bsCaps.browserVersion,
                     osNavn = bsCaps.os, osVersjon = bsCaps.osVersion, opplosning = bsCaps.resolution
                 });
-                Console.WriteLine("Id mottatt er :  " + enhetIdForDB);
             }
             
             MaksimerVindu();
@@ -131,6 +130,7 @@ namespace TestSuite
         [SetUp]
         public void BeforeEachTest()
         {
+            LogWriter.LogToBrowserStack(driver, "Starter " + TestContext.CurrentContext.Test.MethodName);
             teststartForDB = DateTime.Now;
         }
 
@@ -176,6 +176,7 @@ namespace TestSuite
         [TearDown]
         public void AfterEachTest()
         {
+            LogWriter.LogToBrowserStack(driver, TestContext.CurrentContext.Test.MethodName + " ferdig.");
             if(GlobalVariables.ErProd()  && GlobalVariables.loggTilDatabase)
             {
                 funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
@@ -183,9 +184,7 @@ namespace TestSuite
                 string debugInfo = TestContext.CurrentContext.Result.Message + TestContext.CurrentContext.Result.StackTrace;
                 if(debugInfo != null && debugInfo.Length > 1300)
                 {
-                    Console.WriteLine("Kutter debuginfo:\n " + debugInfo);
                     debugInfo = debugInfo.Substring(0, 300) + "[stripped]" + debugInfo.Substring(debugInfo.Length - 700, 700);
-                    Console.WriteLine("Debuginfo kuttet:\n " + debugInfo);
                 }
 
                 if((int)TestContext.CurrentContext.Result.Outcome.Status != 1) // Lagrer ikke skippede/ignorerte tester i DB
@@ -194,14 +193,6 @@ namespace TestSuite
                         enhetOppsettId = enhetIdForDB, funksjonellTestId = funkTestIdForDB, resultatId = (int)TestContext.CurrentContext.Result.Outcome.Status,
                         starttid = teststartForDB, sluttid = DateTime.Now,
                         debugInformasjon = ""});
-                }
-                 
-                if((int)TestContext.CurrentContext.Result.Outcome.Status == 4)
-                {
-                    Console.WriteLine("Sendt feilet test til db: " + "Enhet-id: " + enhetIdForDB + 
-                    " funktestid: " +  funkTestIdForDB +
-                    " teststartForDB: " +  teststartForDB +
-                    "debuginfo: " + debugInfo);
                 }
             }
 
@@ -247,7 +238,7 @@ namespace TestSuite
             }
             try
             {
-                GaaTilDigilaer();
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
                 
                 if(GlobalVariables.ErProd())
                 {
@@ -265,14 +256,10 @@ namespace TestSuite
                     driver.FindElement(By.PartialLinkText("nynorsk")).Click();
                 }
                 HaandterMacSafari();
-                
-                if(GlobalVariables.ErProd())
-                {
-                    Assert.That(driver.PageSource.ToLower().Contains("moglegheiter"), Is.True);
-                }
 
                 if(GlobalVariables.ErProd())
                 {
+                    Assert.That(driver.PageSource.ToLower().Contains("moglegheiter"), Is.True);
                     if(driver.FindElement(By.Id("language-switcher")).Displayed)
                     {
                         driver.FindElement(By.Id("language-switcher")).Click();
@@ -383,7 +370,6 @@ namespace TestSuite
                 string pageSource = driver.PageSource;
 
                 Assert.That(pageSource.Contains("Oppslagstavle"), Is.True);
-
                 LoggUt();
             } catch (Exception exception)
             {
@@ -715,7 +701,6 @@ namespace TestSuite
                     Thread.Sleep(1000); 
                     inputFelt.SendKeys(Keys.Enter);
                     Thread.Sleep(1000); 
-                    // Console.WriteLine(driver.PageSource.ToLower());
 
                     driver.SwitchTo().ParentFrame();
                     Thread.Sleep(1000);
@@ -828,12 +813,12 @@ namespace TestSuite
             if(GlobalVariables.ErStage())
             {
                driver.FindElement(By.XPath("//button[@type='submit']")).Click(); 
-               HaandterMacSafari();
-            }
-            Thread.Sleep(5000); // Lar systemet få logge bruker inn
+               Thread.Sleep(5000); // Lar systemet få logge bruker inn
             
                 GaaTilDigilaer();
-                HaandterSamtykke();
+            }
+
+            HaandterSamtykke();
 
             HaandterMacSafari();
             Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
@@ -845,7 +830,7 @@ namespace TestSuite
             
             AapneBrukerMeny();
 
-            HaandterMacSafari();
+            Thread.Sleep(1000);
             driver.FindElement(By.LinkText("Logg ut")).Click();
             HaandterMacSafari();
         }
@@ -863,7 +848,12 @@ namespace TestSuite
 
         private void GaaTilDigilaer()
         {
-            driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
+            if(GlobalVariables.ErProd())
+            {
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+            } else {
+                driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
+            }
             Thread.Sleep(2000); // Kan ta litt tid før cookie-knapp plutselig kommer
             ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("agree-button"));
             if(agreeKnappeListe.Count > 0 && agreeKnappeListe[0].Enabled)
@@ -872,7 +862,7 @@ namespace TestSuite
                     agreeKnappeListe[0].Click();
                 } catch(Exception e)
                 {
-                    Console.WriteLine("Aksepter cookies lot se ikke klikke. Antall cookie-knapper: " + agreeKnappeListe.Count);
+                    LogWriter.LogToBrowserStack(driver, "Aksepter cookies lot se ikke klikke. Antall cookie-knapper: " + agreeKnappeListe.Count);
                 }
             }
         }
@@ -950,13 +940,13 @@ namespace TestSuite
                 driver.SwitchTo().Alert().Accept();
             } catch(Exception e)
             {
-                Console.WriteLine("Alert håndtering exception catched");
+                LogWriter.LogToBrowserStack(driver, "Alert håndtering exception catched");
             }
         }
 
         private void HaandterFeiletTest(Exception e, string testnavn)
         {
-            Console.WriteLine(e.StackTrace);
+            LogWriter.LogToBrowserStack(driver, e.StackTrace);
             Printscreen.TakeScreenShot(driver, testnavn);
             LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
             

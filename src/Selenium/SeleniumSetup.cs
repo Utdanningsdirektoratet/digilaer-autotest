@@ -42,10 +42,12 @@ namespace Selenium
             capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
             capability.AddAdditionalCapability("browserstack.seleniumLogs", "true");
             capability.AddAdditionalCapability("browserstack.appiumLogs", "true");
+            capability.AddAdditionalCapability("browserstack.networkLogs", "true");  
             capability.AddAdditionalCapability("browserstack.video", "true");
-            capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.networkLogs", "false");
-            capability.AddAdditionalCapability("browserstack.appium_version", "1.22.0");
+            capability.AddAdditionalCapability("browserstack.debug", "true"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.console", "verbose"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.consoleLogs", "verbose"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.appium_version", "2.0.0");
 
             capability.AddAdditionalCapability("browserstack.user", BrowserStackUsername);
             capability.AddAdditionalCapability("browserstack.key", BrowserStackKey);

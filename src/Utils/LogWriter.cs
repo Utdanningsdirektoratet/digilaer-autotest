@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Reflection;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Firefox;
 
  namespace Utils 
  {
@@ -11,6 +13,16 @@ using System.Reflection;
         public LogWriter(string logMessage)
         {
             LogWrite(logMessage);
+        }
+
+        public static void LogToBrowserStack(IWebDriver driver, string logMessage)
+        {
+            if(driver.GetType() != typeof(FirefoxDriver))
+            {
+                ((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"annotate\", \"arguments\": {\"data\":\"" + logMessage + "\", \"level\": \"info\"}}");
+            } else {
+                Console.WriteLine(logMessage);
+            }
         }
 
         public static void LogWrite(string logMessage)
