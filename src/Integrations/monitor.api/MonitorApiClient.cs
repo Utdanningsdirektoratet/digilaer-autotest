@@ -14,7 +14,6 @@ namespace monitor.api
 
         public static async void PingApi()
         {
-            Console.WriteLine("Wake the Azure-function from sleep");
             string content = "";
             HttpClient client = new HttpClient();
 
@@ -27,15 +26,9 @@ namespace monitor.api
 
             using (HttpResponseMessage response = client.GetAsync(pingUrl).Result)
             {
-                Console.WriteLine("Resp: " + response);
-                Console.WriteLine("Resp2: " + response.Content);
-                Console.WriteLine("Resp3: " + response.StatusCode);
-                Console.WriteLine("" + response.ToString());
-
                 using (HttpContent cont = response.Content)
                 {
                     var json = cont.ReadAsStringAsync().Result;
-                    Console.WriteLine("Json: " + json);
                 }
             }
         }
@@ -52,7 +45,6 @@ namespace monitor.api
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 string json = JsonConvert.SerializeObject(enhetOppsett);
-                Console.WriteLine("Json: " + json);
                 streamWriter.Write(json);
             }
 
@@ -62,7 +54,6 @@ namespace monitor.api
             {
                 result =  streamReader.ReadToEnd();
             }
-            //return  new OkObjectResult(result);
             return Int32.Parse(result);
         }
 
@@ -76,7 +67,6 @@ namespace monitor.api
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 string json = "{'metodenavnTest': '" + metodenavnTest + "', 'funksjoneltNavnTest': '" + funksjoneltNavnTest + "'}";
-                Console.WriteLine("Json: " + json);
                 streamWriter.Write(json);
             }
 
@@ -86,7 +76,6 @@ namespace monitor.api
             {
                 result =  streamReader.ReadToEnd();
             }
-            // return  new OkObjectResult(result);
             return Int32.Parse(result);
         }
 
@@ -101,7 +90,6 @@ namespace monitor.api
             {
                 string json = JsonConvert.SerializeObject(testkjoring);
 
-                Console.WriteLine(json);
                 streamWriter.Write(json);
             }
 

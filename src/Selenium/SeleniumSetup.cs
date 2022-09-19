@@ -14,20 +14,6 @@ namespace Selenium
         private static int timeoutSekunder = 10;
         public IWebDriver GetBrowserstackDriver(BrowserStackCapabilities bsCaps)
         {
-             // capability = new OpenQA.Selenium.Chrome.ChromeOptions(); // Gir authentication error mot BrowserStack.
-
-            /* if(bsCaps.browser.Contains("Safari")  || bsCaps.browser.Contains("iPhone")) {
-                capability = new OpenQA.Selenium.Safari.SafariOptions();
-            } else if(bsCaps.browser.Contains("Firefox")) {
-                //capability = new OpenQA.Selenium.Firefox.FirefoxOptions();
-
-                capability = new OpenQA.Selenium.Edge.EdgeOptions();
-             } else if(bsCaps.browser.Contains("Chrome") || bsCaps.browser.Contains("Android")) {
-                capability = new OpenQA.Selenium.Chrome.ChromeOptions();
-            } else {
-                capability = new OpenQA.Selenium.Edge.EdgeOptions();
-            } */
-
             DriverOptions capability = new OpenQA.Selenium.Edge.EdgeOptions();
 
             capability.AddAdditionalCapability("os", bsCaps.os);
@@ -39,26 +25,19 @@ namespace Selenium
             capability.AddAdditionalCapability("name", "Test med " + GetNameString(bsCaps));
             capability.AddAdditionalCapability("build", GetBuildString(bsCaps));
             capability.AddAdditionalCapability("browserstack.local", bsCaps.local);
-            capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
-            capability.AddAdditionalCapability("browserstack.seleniumLogs", "true");
-            capability.AddAdditionalCapability("browserstack.appiumLogs", "true");
-            capability.AddAdditionalCapability("browserstack.networkLogs", "true");  
-            capability.AddAdditionalCapability("browserstack.video", "true");
-            capability.AddAdditionalCapability("browserstack.debug", "true"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.console", "verbose"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.consoleLogs", "verbose"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.appium_version", "2.0.0");
 
+            capability.AddAdditionalCapability("browserstack.video", "true");
+            capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
+            capability.AddAdditionalCapability("browserstack.appiumLogs", "true");
+            capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.console", "errors"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.consoleLogs", "errors"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.seleniumLogs", "false");
+            capability.AddAdditionalCapability("browserstack.networkLogs", "false");
+
+            capability.AddAdditionalCapability("browserstack.appium_version", "2.0.0");
             capability.AddAdditionalCapability("browserstack.user", BrowserStackUsername);
             capability.AddAdditionalCapability("browserstack.key", BrowserStackKey);
-
-//          ChromeOptions options = new ChromeOptions(); //Execute Selenium Chrome WebDriver in silent mode
-//          options.AddArgument("--log-level=3");
-
-            /* if(bsCaps.device != null && (bsCaps.device.Contains("iPad") || bsCaps.device.Contains("iPhone")))
-            {
-                capability.AddAdditionalCapability("safariAllowPopups", "true");
-            } */
 
             if(bsCaps.device != null)
             {
@@ -66,7 +45,7 @@ namespace Selenium
             }
 
             IWebDriver driver = new RemoteWebDriver(new Uri("http://hub-cloud.browserstack.com/wd/hub"), capability);
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10); // Implisitt venting 10 sekunder
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
             return driver;
         }
@@ -111,7 +90,7 @@ namespace Selenium
             return buildString;
         }
 
-        // For lokal testing evt
+        // For lokal testing
         public IWebDriver GetFirefoxDriver()
         {
             IWebDriver driver = new FirefoxDriver();

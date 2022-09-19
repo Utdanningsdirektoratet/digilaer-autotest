@@ -409,11 +409,9 @@ namespace TestSuite
                 driver.FindElement(By.LinkText("Kurs")).Click();
                 Thread.Sleep(3000);
                 driver.FindElement(By.XPath("//button[.='Slå redigering på']")).Click();
-                Thread.Sleep(5000); // HaandterMacSafari(); // For element stale exception on appium iphone.
-                // TODO: Fix sjekk:
-                // ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//a[@aria-label='Rediger']"));
-                // Assert.That(redigerknapper.Count, Is.GreaterThan(6));
-
+                Thread.Sleep(2000); // HaandterMacSafari(); // For element stale exception on appium iphone.
+                ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//i[@aria-label='Rediger']"));
+                Assert.That(redigerknapper.Count, Is.GreaterThan(6));
                 driver.FindElement(By.XPath("//button[.='Slå redigering av']")).Click();
 
                 LoggUt();
@@ -442,7 +440,7 @@ namespace TestSuite
             LoggInnMedFeide(fnr, pw);
             GaaTilSeleniumFag();
             
-            driver.FindElement(By.LinkText("SELENIUM test Adobe Connect")).Click();
+            driver.FindElement(By.XPath("//a[.//span[starts-with(., 'SELENIUM test Adobe Connect')]]")).Click();
             int retries = 0; // For adobeconnect-hikke
             string moteUrl = null;
 
@@ -459,6 +457,7 @@ namespace TestSuite
             }
             if(retries > 0)
             {
+                LogWriter.LogToBrowserStack(driver, "AdobeConnect trengte " + retries + " forsøk, av 5 mulige.");
                 Assert.Warn("Adobeconnect test gikk videre etter retry");
             }
 
@@ -584,9 +583,9 @@ namespace TestSuite
                 driver.FindElement(By.ClassName("minilesson_nextbutton")).Click();
                 Thread.Sleep(3000);
     
-                //driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
-                    //Thread.Sleep(3000);
-                //driver.FindElement(By.ClassName("btn-primary")).Click();
+                // driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
+                // Thread.Sleep(3000);
+                // driver.FindElement(By.ClassName("btn-primary")).Click();
 
                 LoggUt();
             } catch (Exception exception)
@@ -659,7 +658,6 @@ namespace TestSuite
                 
                 GaaTilSeleniumFag();
                 driver.FindElement(By.XPath("//a[.//span[starts-with(., 'Trinket')]]")).Click();
-                // driver.FindElement(By.XPath("//a[starts-with(., 'Trinket')]")).Click();
                 HaandterMacSafari();
 
                 if(bsCaps.device != null && bsCaps.device.Contains("iPad"))
@@ -837,13 +835,7 @@ namespace TestSuite
 
         private void AapneBrukerMeny()
         {
-            try
-            {
-                driver.FindElement(By.ClassName("avatars")).Click();
-            } catch(Exception e)
-            {
-                driver.FindElement(By.ClassName("usermenu")).Click();
-            }
+            driver.FindElement(By.ClassName("usermenu")).Click();
         }
 
         private void GaaTilDigilaer()
