@@ -35,7 +35,7 @@ namespace Selenium
             capability.AddAdditionalCapability("browserstack.seleniumLogs", "false");
             capability.AddAdditionalCapability("browserstack.networkLogs", "false");
 
-            capability.AddAdditionalCapability("browserstack.appium_version", "1.13.0"); // 2.0.0
+            capability.AddAdditionalCapability("browserstack.appium_version", "1.21.0"); // 2.0.0
             capability.AddAdditionalCapability("browserstack.user", BrowserStackUsername);
             capability.AddAdditionalCapability("browserstack.key", BrowserStackKey);
 
