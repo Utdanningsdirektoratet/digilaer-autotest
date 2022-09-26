@@ -773,7 +773,7 @@ namespace TestSuite
             HaandterMacSafari();
 
             IWebElement feideLogin = driver.FindElement(By.ClassName("feide-login"));
-            feideLogin.FindElement(By.LinkText("Logg inn")).Click();
+            feideLogin.FindElement(By.TagName("a")).Click();
 
             HaandterMacSafari();
 
@@ -835,7 +835,9 @@ namespace TestSuite
 
         private void AapneBrukerMeny()
         {
-            driver.FindElement(By.ClassName("usermenu")).Click();
+            Thread.Sleep(1000);
+            driver.FindElement(By.Id("user-menu-toggle")).Click();
+            Thread.Sleep(1000);
         }
 
         private void GaaTilDigilaer()
