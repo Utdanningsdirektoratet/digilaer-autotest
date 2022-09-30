@@ -159,13 +159,13 @@ namespace TestSuite
             } else if(TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Warning) 
             {
                 resultatTekst = oppsettTekst + ":\n"
-                + ":white_check_mark:" + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
+                + ":white_check_mark:" + (TestContext.CurrentContext.Result.PassCount + TestContext.CurrentContext.Result.WarningCount) + " tester kjørt ok!:ok_hand:\n"
                 + resultatTekst;
                 if (driver.GetType() != typeof(FirefoxDriver)) {((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");}
             } else
             {
                 resultatTekst = oppsettTekst + ":\n"
-                + ":white_check_mark:" + "Alle " + TestContext.CurrentContext.Result.PassCount + " tester kjørt ok!:ok_hand:\n"
+                + ":white_check_mark:" + "Alle " + (TestContext.CurrentContext.Result.PassCount + TestContext.CurrentContext.Result.WarningCount) + " tester kjørt ok!:ok_hand:\n"
                 + resultatTekst;
                 if (driver.GetType() != typeof(FirefoxDriver)) {((IJavaScriptExecutor)driver).ExecuteScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"passed\", \"reason\": \" Test OK. \"}}");}
             }
@@ -807,6 +807,9 @@ namespace TestSuite
 
             driver.FindElement(By.XPath("//button[@type='submit']")).Click();
             HaandterMacSafari();
+            if(bsCaps.browser.Equals("Safari") && bsCaps.os != null && bsCaps.os.Equals("OS X")) {
+                Thread.Sleep(10000);
+            }
 
             if(GlobalVariables.ErStage())
             {
