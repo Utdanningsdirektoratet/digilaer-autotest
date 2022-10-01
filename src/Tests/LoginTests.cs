@@ -805,7 +805,9 @@ namespace TestSuite
             driver.FindElement(By.Id("username")).SendKeys(brukernavn);
             driver.FindElement(By.Id("password")).SendKeys(passord);
 
-            driver.FindElement(By.XPath("//button[@type='submit']")).Click();
+            Thread.Sleep(3000);
+            driver.FindElement(By.XPath("//button[@type='submit']")).Click(); // Problem både før og etter her på android-devices, forsøker sleep..
+            Thread.Sleep(3000);
             HaandterMacSafari();
             if(bsCaps.browser.Equals("Safari") && bsCaps.os != null && bsCaps.os.Equals("OS X")) {
                 Thread.Sleep(10000);
