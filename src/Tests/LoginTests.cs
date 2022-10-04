@@ -458,6 +458,7 @@ namespace TestSuite
             if(retries > 0)
             {
                 LogWriter.LogToBrowserStack(driver, "AdobeConnect trengte " + retries + " forsøk, av 5 mulige.");
+                LogWriter.LogToBrowserStack(driver, "Møteurl: " + moteUrl);
                 Assert.Warn("Adobeconnect test gikk videre etter retry");
             }
 
@@ -813,14 +814,6 @@ namespace TestSuite
                 Thread.Sleep(10000);
             }
 
-            if(GlobalVariables.ErStage())
-            {
-               driver.FindElement(By.XPath("//button[@type='submit']")).Click(); 
-               Thread.Sleep(5000); // Lar systemet få logge bruker inn
-            
-                GaaTilDigilaer();
-            }
-
             HaandterSamtykke();
 
             HaandterMacSafari();
@@ -853,7 +846,10 @@ namespace TestSuite
             } else {
                 driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
             }
-            Thread.Sleep(2000); // Kan ta litt tid før cookie-knapp plutselig kommer
+
+            Thread.Sleep(2000);
+            HaandterAlert();
+            Thread.Sleep(2000);
             ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("agree-button"));
             if(agreeKnappeListe.Count > 0 && agreeKnappeListe[0].Enabled)
             {
@@ -945,9 +941,9 @@ namespace TestSuite
 
         private void HaandterFeiletTest(Exception e, string testnavn)
         {
+            LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
             LogWriter.LogToBrowserStack(driver, e.StackTrace);
             Printscreen.TakeScreenShot(driver, testnavn);
-            LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
             
             HaandterAlert();
             GaaTilSkoleDigilaer();
