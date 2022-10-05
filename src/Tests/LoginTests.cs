@@ -444,6 +444,7 @@ namespace TestSuite
             int retries = 0; // For adobeconnect-hikke
             string moteUrl = null;
 
+            HaandterMacSafari();
             while(moteUrl == null && retries < 5)
             {
                 try
@@ -761,7 +762,7 @@ namespace TestSuite
                 HaandterFeiletTest(exception, System.Reflection.MethodBase.GetCurrentMethod().Name);
             }
         }
-    
+
         private void LoggInnMedFeide(string brukernavn, string passord)
         {
             HaandterMacSafari();
@@ -785,14 +786,6 @@ namespace TestSuite
 
             HaandterMacSafari();
             Thread.Sleep(2000);
-
-            if(GlobalVariables.ErTest())
-            {
-                driver.FindElement(By.Id("dropdownlist")).Click();
-                driver.FindElements(By.TagName("option"))[1].Click();
-                driver.FindElement(By.ClassName("btn")).Click();
-                HaandterMacSafari();
-            }
 
             if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
             {
@@ -942,7 +935,7 @@ namespace TestSuite
         private void HaandterFeiletTest(Exception e, string testnavn)
         {
             LogWriter.LogWrite(testnavn + " feilet. Stacktrace:\n" + e.StackTrace);
-            LogWriter.LogToBrowserStack(driver, e.StackTrace);
+            LogWriter.LogToBrowserStack(driver, testnavn + " feilet");
             Printscreen.TakeScreenShot(driver, testnavn);
             
             HaandterAlert();

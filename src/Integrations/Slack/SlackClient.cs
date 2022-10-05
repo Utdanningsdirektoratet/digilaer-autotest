@@ -8,14 +8,16 @@ namespace Slack
     {
         private static string baseSlackUrl = "https://hooks.slack.com/";
         private static string slackHookUrl = "services/" + System.Environment.GetEnvironmentVariable("DIGI_SLACK_WEBHOOK_PW");
-        private static string slackUserName = "Digilær Autotest";
+        private static string slackUserName = "Digilær Auto-";
 
         public static async void CallSlack(string slackText)
         {
             HttpClient client = new HttpClient();
             
             string slackEmoji =  ":digilaer:"; 
-            string content = "{\"channel\" : \"" + "#autotest_digilær_" + GlobalVariables.miljo + "\", \"username\": \"" + slackUserName + "\", \"text\": \""+ slackText +"\", \"icon_emoji\": \"" + slackEmoji + "\"}";
+            string slackChannel = "#autotest_digilær_" + (GlobalVariables.ErTest() ? "stage" : GlobalVariables.miljo);
+
+            string content = "{\"channel\" : \"" + slackChannel + "\", \"username\": \"" + slackUserName + GlobalVariables.miljo + "\", \"text\": \""+ slackText +"\", \"icon_emoji\": \"" + slackEmoji + "\"}";
             client.BaseAddress = new System.Uri(baseSlackUrl);
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             

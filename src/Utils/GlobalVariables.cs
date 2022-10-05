@@ -48,7 +48,8 @@ namespace Utils
         public static void SetTestEnv()
         {
             GlobalVariables.miljo = Miljo.Test;
-            GlobalVariables.digilaerUrl = "https://moodle-test.udir.c.bitbit.net";
+            GlobalVariables.digilaerUrl = "https://moodle-test.udir.c.bitbit.net/my";
+            GlobalVariables.digilaerSkoleUrl = "https://moodle-test.udir.c.bitbit.net/my";
             GlobalVariables.loggTilDatabase =   false;
         }
     }
