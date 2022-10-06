@@ -504,13 +504,13 @@ namespace TestSuite
             } else
             {
                 // TODO: Implementer hvis støttet fra driver:
-        //         Thread.Sleep(10000);
-        //         if(driver.FindElements(By.XPath("//*[text='Open in Browser']")).Count > 0) {
-        //             driver.FindElement(By.XPath("//*[text='Open in Browser']")).Click();
-        //             Thread.Sleep(10000);
-        //         } else {
-        //             Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));       
-        //         }
+                // Thread.Sleep(10000);
+                // if(driver.FindElements(By.XPath("//*[text='Open in Browser']")).Count > 0) {
+                //     driver.FindElement(By.XPath("//*[text='Open in Browser']")).Click();
+                //     Thread.Sleep(10000);
+                // } else {
+                //     Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));       
+                // }
             }
             GaaTilDigilaer();
             HaandterAlert();
@@ -536,10 +536,9 @@ namespace TestSuite
         [TestCase(TestName = "Test Poodl MiniLesson diktat")]
         public void TestPoodlMinilessonDiktat()
         {
-            if(GlobalVariables.ErProd() || (bsCaps.device != null && 
-                (bsCaps.device.Contains("iPad") || bsCaps.device.Contains("iPhone") || bsCaps.device.Contains("Pixel 4") || bsCaps.device.Contains("OnePlus 9") || bsCaps.device.Contains("Galaxy S21"))))
+            if(GlobalVariables.ErProd() || (bsCaps.device != null && bsCaps.device.Contains("Tab S7")))
             {
-                Assert.Ignore(); // Skal kun testes på Stage
+                Assert.Ignore(); // Skal ikke testes i Prod, og S7 støttes ikke
             }
 
             try
@@ -549,14 +548,13 @@ namespace TestSuite
 
                 GaaTilSeleniumFag();
                 
-                // Gå inn på poodl minilesson
                 driver.FindElement(By.XPath("//a[.//span[starts-with(., 'Poodll')]]")).Click();
                 Thread.Sleep(3000);
                 if(driver.FindElements(By.ClassName("btn_finished_attempt")).Count > 0 &&
                         driver.FindElement(By.ClassName("btn_finished_attempt")).Displayed)
                 {
                     driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
-                    Thread.Sleep(3000); // Trengs i FF hvertfall.
+                    Thread.Sleep(3000);
                     
                     driver.FindElement(By.XPath("//button[@data-action='save']")).Click();
                     HaandterMacSafari();
@@ -566,28 +564,30 @@ namespace TestSuite
                 Thread.Sleep(500);
                 Assert.True(driver.FindElement(By.ClassName("fa-spinner")).Displayed);
                 Thread.Sleep(10000);
-                 // Mulig at dette kun fungerer på enkelte devicer: Altså at spinner ikke forsvinner:
-                Assert.True(driver.FindElement(By.ClassName("fa-play")).Displayed);
+                if((bsCaps.device != null && 
+                    (bsCaps.device.Contains("iPad") || bsCaps.device.Contains("iPhone") || bsCaps.device.Contains("Pixel 4") || bsCaps.device.Contains("OnePlus 9") || bsCaps.device.Contains("Galaxy S21") || bsCaps.device.Contains("Galaxy S10")))
+                    || (bsCaps.os != null && (bsCaps.os.Equals("Windows") && (bsCaps.browser.Equals("Chrome") || bsCaps.browser.Equals("Edge"))) 
+                    || (bsCaps.os.Equals("OS X") && bsCaps.browser.Equals("Chrome") || bsCaps.browser.Equals("Edge"))
+                    )
+                )
+                {
+                    // Spinner forsvinner ikke ved automatisert test på disse enhetene
+                } else {
+                    Assert.True(driver.FindElement(By.ClassName("fa-play")).Displayed);
+                }
 
                 IWebElement inputFelt = driver.FindElement(By.XPath("//input[@maxlength='6']"));
                 inputFelt.SendKeys("alw");
                 Thread.Sleep(2000);
                 IWebElement feedback = driver.FindElement(By.ClassName("dictate-feedback"));
                 Assert.True(feedback.GetAttribute("style").Equals("color: red;"));
-                // Assert.True(driver.FindElement(By.ClassName("fa-times")).Displayed);
-                // Assert.False(driver.FindElement(By.ClassName("fa-check")).Displayed);
 
                 inputFelt.SendKeys("ays");
                 Thread.Sleep(1000);
                 Assert.True(feedback.GetAttribute("style").Equals("color: green;"));
-                // Assert.True(driver.FindElement(By.ClassName("fa-check")).Displayed);
                 
                 driver.FindElement(By.ClassName("minilesson_nextbutton")).Click();
                 Thread.Sleep(3000);
-    
-                // driver.FindElement(By.ClassName("btn_finished_attempt")).Click();
-                // Thread.Sleep(3000);
-                // driver.FindElement(By.ClassName("btn-primary")).Click();
 
                 LoggUt();
             } catch (Exception exception)
@@ -602,7 +602,7 @@ namespace TestSuite
         {
             if(GlobalVariables.ErProd())
             {
-                Assert.Ignore(); // Skal kun testes på Stage
+                Assert.Ignore(); // Skal ikke testes i Prod
             }
 
             try
@@ -630,7 +630,7 @@ namespace TestSuite
                 IWebElement slippFeltEn = driver.FindElements(By.ClassName("droptarget"))[0]; 
 
                 // TODO:
-                // dra ord inn i felter
+                // Dra ord inn i felter
                 // Actions drag: Fungerer ikke med safari-driver
                 // Assert Resultat
                 // Klikk begynn på nytt
@@ -650,7 +650,7 @@ namespace TestSuite
         {
             if(GlobalVariables.ErProd() || (bsCaps.device != null && bsCaps.device.Contains("iPhone")))
             {
-                Assert.Ignore(); // Skal kun testes på Stage
+                Assert.Ignore(); // Skal ikke testes i Prod
             }
             
             try
@@ -666,9 +666,8 @@ namespace TestSuite
                 {
                     IWebElement iFrameTrinket = driver.FindElement(By.TagName("iframe"));
 
+                    // iFrame fungerer ikke på automatisert iPad
                     Assert.IsTrue(iFrameTrinket.Displayed);
-
-                    // driver.SwitchTo().Frame(iFrameVimeo); // Fungerer ikke på automatisert iPad
                     Thread.Sleep(5000);
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
                 } else
@@ -682,23 +681,11 @@ namespace TestSuite
                     driver.FindElement(By.ClassName("run-it")).Click();
                     Thread.Sleep(4000); 
 
-                // TODO Sende tall: InputSimulator funker ikke
-                //  InputSimulator sim = new InputSimulator();
-                //  Thread.Sleep(5000); 
-                //  sim.Keyboard.TextEntry("4");
-                //  Thread.Sleep(5000); 
-                //  sim.Keyboard.TextEntry("4");
-
+                    // TODO: Sende tall
                     IWebElement inputFelt = driver.FindElement(By.Id("honeypot"));
                     inputFelt.SendKeys("4+2");
                     Thread.Sleep(5000); 
-
-                    // MouseHook m;
-                    //  Actions action = new Actions(driver); 
-                    // action.SendKeys("4").Perform();
-                    //action.KeyDown("4").sendKeys(String.valueOf('\u0061')).perform();
                     
-                    Thread.Sleep(1000); 
                     inputFelt.SendKeys(Keys.Enter);
                     Thread.Sleep(1000); 
 
@@ -719,7 +706,7 @@ namespace TestSuite
         {
             if(GlobalVariables.ErProd() || (bsCaps.device != null && bsCaps.device.Contains("iPhone")))
             {
-                Assert.Ignore(); // Skal kun testes på Stage
+                Assert.Ignore(); // Skal ikke testes i Prod, og støttes ikke på iPhone
             }
             
             try
@@ -737,7 +724,6 @@ namespace TestSuite
 
                     Assert.IsTrue(iFrameVimeo.Displayed);
 
-                    // driver.SwitchTo().Frame(iFrameVimeo); // Fungerer ikke på automatisert iPad
                     Thread.Sleep(5000);
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
                 } else
@@ -779,9 +765,10 @@ namespace TestSuite
 
             HaandterMacSafari();
 
-            if(driver.FindElements(By.ClassName("dl-linkbutton")).Count > 0)
-            { // Flere login-knapper: Klikker den første for å komme videre
-                driver.FindElements(By.ClassName("dl-linkbutton"))[0].Click();
+            ReadOnlyCollection<IWebElement> loginButtons = driver.FindElements(By.ClassName("dl-linkbutton"));
+            if(loginButtons.Count > 0)
+            {
+                loginButtons[0].Click();
             }
 
             HaandterMacSafari();
@@ -790,7 +777,7 @@ namespace TestSuite
             if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
             {
                 IWebElement orgSelector = driver.FindElement(By.Id("org_selector_filter"));
-                orgSelector.SendKeys("Utdanningsdirektoratet - systemorganisasjon"); // For testing mot dataporten bruk "Tjenesteleverandør"
+                orgSelector.SendKeys("Utdanningsdirektoratet - systemorganisasjon"); // For testing mot dataporten: Bruk "Tjenesteleverandør"
                 driver.FindElement(By.XPath("//span[.='Utdanningsdirektoratet - systemorganisasjon']")).Click();
                 driver.FindElement(By.Id("selectorg_button")).Click();
             }
@@ -800,7 +787,7 @@ namespace TestSuite
             driver.FindElement(By.Id("password")).SendKeys(passord);
 
             Thread.Sleep(3000);
-            driver.FindElement(By.XPath("//button[@type='submit']")).Click(); // Problem både før og etter her på android-devices, forsøker sleep..
+            driver.FindElement(By.XPath("//button[@type='submit']")).Click(); // Sleep før og etter for android-devices
             Thread.Sleep(3000);
             HaandterMacSafari();
             if(bsCaps.browser.Equals("Safari") && bsCaps.os != null && bsCaps.os.Equals("OS X")) {
@@ -810,7 +797,8 @@ namespace TestSuite
             HaandterSamtykke();
 
             HaandterMacSafari();
-            Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
+            Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  
+                "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
         }
 
         private void LoggUt()
@@ -870,9 +858,9 @@ namespace TestSuite
             HaandterMacSafari();
             AapneBrukerMeny();
             driver.FindElement(By.LinkText("Profil")).Click();
-            Thread.Sleep(2000); // TODO: Vurder om nødvendig... 
+            Thread.Sleep(2000);
             driver.FindElement(By.LinkText("Selenium")).Click();
-            Thread.Sleep(2000); // TODO: Vurder om nødvendig... 
+            Thread.Sleep(2000);
             driver.FindElement(By.LinkText("Kurs")).Click();
             HaandterMacSafari();
         }
@@ -893,8 +881,6 @@ namespace TestSuite
                 driver.FindElement(By.XPath("//button[@type='submit']")).Click();
                 GaaTilDigilaer();
             }
-            // Verken avslutt veileder eller klikke neste knapp fungerer skikkelig i Selenium
-            // Vurdere evt tab klikk x3 + Enter ? 
             if(driver.FindElements(By.XPath("//button[text='Avslutt veileder']")).Count > 0)
             {
                 driver.FindElement(By.XPath("//button[text='Avslutt veileder']")).Click();
@@ -905,7 +891,7 @@ namespace TestSuite
         {
             // Safari webdriver mac os respekterer ikke webdriver wait (!?)
             // https://developer.apple.com/forums/thread/106693
-            // TODO: Vurder behov for denne metoden, eller se etter bedre fiks
+            // TODO: Vurder behov for denne metoden, eller lag bedre fiks
 
             if((bsCaps.browser != null && bsCaps.browser.Equals("Safari") &&
                 bsCaps.os != null && bsCaps.os.Equals("OS X"))

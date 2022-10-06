@@ -34,7 +34,6 @@ namespace monitor.api
         }
 
         // TODO: Trekk ut felleskomponenter til egne metoder
-        //  Task<int> .. var tidl: async
         public static int FindOrCreateEnhetOppsett(EnhetOppsett enhetOppsett)
         {
             string findOrCreateEnhetUrl = "find-or-create-enhet-oppsett?code=" +  System.Environment.GetEnvironmentVariable("DIGI_API_CODE_ENHET");
