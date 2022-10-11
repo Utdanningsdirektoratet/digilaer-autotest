@@ -11,7 +11,7 @@ namespace Selenium
     {
         private static string BrowserStackUsername = System.Environment.GetEnvironmentVariable("DIGI_BS_USER");
         private static string BrowserStackKey = System.Environment.GetEnvironmentVariable("DIGI_BS_KEY");
-        private static int timeoutSekunder = 10;
+        private static int TimeoutSekunder = 10;
         public IWebDriver GetBrowserstackDriver(BrowserStackCapabilities bsCaps)
         {
             DriverOptions capability = new OpenQA.Selenium.Edge.EdgeOptions();
@@ -78,7 +78,7 @@ namespace Selenium
 
         private static string GetBuildString(BrowserStackCapabilities bsCaps)
         {
-            string buildString = "BStack_" + GlobalVariables.miljo + "_";
+            string buildString = "BStack_" + GlobalVariables.Miljo + "_";
             if(bsCaps.os != null)
             {
                 buildString += bsCaps.os + "_" + bsCaps.osVersion;
@@ -94,7 +94,7 @@ namespace Selenium
         public IWebDriver GetFirefoxDriver()
         {
             IWebDriver driver = new FirefoxDriver();
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(timeoutSekunder);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeoutSekunder);
             return driver;
         }
     }

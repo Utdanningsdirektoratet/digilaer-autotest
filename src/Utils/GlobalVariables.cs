@@ -7,50 +7,61 @@ namespace Utils
  {
     public static class GlobalVariables
     {
-        public static Miljo miljo;
-        public static string digilaerUrl;
-        public static string digilaerSkoleUrl;
-        public static bool loggTilDatabase;
-
-        public static string slackChannel;
+        public static Miljo Miljo {get; private set;}
+        public static string DigilaerUrl {get; private set;}
+        public static string DigilaerSkoleUrl {get; private set;}
+        private static bool LoggTilDatabase;
+        private static bool Scheduled = false;
+        private static string SlackChannel {get;}
 
         public static bool ErProd()
         {
-            return miljo == Miljo.Prod;
+            return Miljo == Miljo.Prod;
         }
 
         public static bool ErStage()
         {
-            return miljo == Miljo.Stage;
+            return Miljo == Miljo.Stage;
         }
         
         public static bool ErTest()
         {
-            return miljo == Miljo.Test;
+            return Miljo == Miljo.Test;
+        }
+
+        public static bool ErScheduled()
+        {
+            return Scheduled;
+        }
+
+        public static bool SkalLoggeTilDatabase()
+        {
+            return LoggTilDatabase;
         }
 
         public static void SetStageEnv()
         {
-            GlobalVariables.miljo = Miljo.Stage;
-            GlobalVariables.digilaerUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
-            GlobalVariables.digilaerSkoleUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
-            GlobalVariables.loggTilDatabase = false;
+            Miljo = Miljo.Stage;
+            DigilaerUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
+            DigilaerSkoleUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
+            LoggTilDatabase = false;
         }
 
-        public static void SetProdEnv()
+        public static void SetProdEnv(bool erScheduled)
         {
-            GlobalVariables.miljo = Miljo.Prod;
-            GlobalVariables.digilaerUrl = "https://digilaer.no";
-            GlobalVariables.digilaerSkoleUrl = "https://skole.digilaer.no";
-            GlobalVariables.loggTilDatabase = System.Environment.GetEnvironmentVariable("DIGI_LOGG_TIL_DB").Equals("true");
+            Miljo = Miljo.Prod;
+            DigilaerUrl = "https://digilaer.no";
+            DigilaerSkoleUrl = "https://skole.digilaer.no";
+            LoggTilDatabase = System.Environment.GetEnvironmentVariable("DIGI_LOGG_TIL_DB").Equals("true");
+            Scheduled = erScheduled;
         }
 
         public static void SetTestEnv()
         {
-            GlobalVariables.miljo = Miljo.Test;
-            GlobalVariables.digilaerUrl = "https://moodle-test.udir.c.bitbit.net/my";
-            GlobalVariables.digilaerSkoleUrl = "https://moodle-test.udir.c.bitbit.net/my";
-            GlobalVariables.loggTilDatabase =   false;
+            Miljo = Miljo.Test;
+            DigilaerUrl = "https://moodle-test.udir.c.bitbit.net/my";
+            DigilaerSkoleUrl = "https://moodle-test.udir.c.bitbit.net/my";
+            LoggTilDatabase =   false;
         }
     }
 

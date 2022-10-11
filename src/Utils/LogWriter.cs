@@ -36,7 +36,7 @@ using OpenQA.Selenium.Firefox;
                     Log(logMessage, writer);
                 }
             }
-            catch (Exception e) {}
+            catch (Exception) {}
         }
 
         private static void Log(string logMessage, TextWriter textWriter)
@@ -49,7 +49,7 @@ using OpenQA.Selenium.Firefox;
                 textWriter.WriteLine("{0}", logMessage);
                 textWriter.WriteLine("------------------------------");
             }
-            catch (Exception e) {}
+            catch (Exception) {}
         }
     }
 }

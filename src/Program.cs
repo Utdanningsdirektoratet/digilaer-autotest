@@ -18,15 +18,17 @@ namespace digilaer_autotest
                         GlobalVariables.SetStageEnv();
                     } else if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("prod"))
                     {
-                        GlobalVariables.SetProdEnv();
+                        GlobalVariables.SetProdEnv(false);
                     } else if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("test"))
                     {
                         GlobalVariables.SetTestEnv();
                     }
-                } else if(args[0].Equals("chron"))
+                } else if(args[0].Equals("chronprod"))
                 {
-                    // Nattlig jobb er alltid mot produksjon
-                    GlobalVariables.SetProdEnv();
+                    GlobalVariables.SetProdEnv(true);
+                } else if(args[0].Equals("chronstage"))
+                {
+                    GlobalVariables.SetStageEnv();
                 }
             }
             return new AutoRun().Execute(new string[0]);

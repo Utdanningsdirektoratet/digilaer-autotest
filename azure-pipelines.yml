@@ -7,7 +7,19 @@ schedules:
     include:
     - main
   batch: true
-  displayName: Nattlig digilær autotest selenium
+  variables:
+    chronEnv: 'chronprod'
+  displayName: Nattlig digilær autotest selenium prod
+
+- cron: "0 14 * * *" 
+  always: true
+  branches:
+    include:
+    - main
+  batch: true
+  variables:
+    chronEnv: 'chronstage'
+  displayName: Nattlig digilær autotest selenium stage
 
 pool:
   vmImage: ubuntu-latest
@@ -28,10 +40,10 @@ stages:
             version: '5.0.x'
 
         - task: DotNetCoreCLI@2
-          displayName: 'Kjør selenium tester prod'
+          displayName: 'Kjør selenium tester skedulert for ${{variables.chronEnv}}'
           inputs:
             command: 'run'
-            arguments: 'chron'
+            arguments: '${{variables.chronEnv}}'
             projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
           condition: eq(variables['Build.Reason'], 'Schedule')
 

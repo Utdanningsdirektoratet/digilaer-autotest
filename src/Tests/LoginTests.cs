@@ -13,13 +13,9 @@ using Selenium;
 using Slack;
 using Utils;
 using OpenQA.Selenium.Firefox;
-//using WindowsInput;
 
 namespace TestSuite
 {
-//   [TestFixture(DeviceConfig.AndroidGalaxyS20)]  // Utgår egentlig pga device issues på bstack iflg support der:       
-//   [TestFixture(DeviceConfig.GooglePixel6)] // Samme som S20 har denne gitt appium/chrome error, så forsøker uten denne også
-//  [Parallelizable(ParallelScope.Fixtures)] // Har et maks antall, trolig 5 stk samtidige. Dersom dette skal benyttes: Sørg for at det er trådsikkert mtp skriving til DB-api
     [TestFixture(DeviceConfig.OSXBigSurEdge)]
     [TestFixture(DeviceConfig.OSXBigSurChrome)]
     [TestFixture(DeviceConfig.OSXBigSurFirefox)]
@@ -38,7 +34,7 @@ namespace TestSuite
     {
         private IWebDriver driver;
         private BrowserStackCapabilities bsCaps;
-        private string fagkodeSelenium = "SEL";
+        private string fagkodeSelenium = "Selenium";
         private string facultyEmployeeLaererFnr = System.Environment.GetEnvironmentVariable("DIGI_USER_FACULTY");
         private string facultyEmployeeLaererPW = System.Environment.GetEnvironmentVariable("DIGI_USER_FACULTY_PW");
         private string studentUnder18Fnr = System.Environment.GetEnvironmentVariable("DIGI_ELEV_UNDER_ATTEN");
@@ -49,7 +45,6 @@ namespace TestSuite
         private int enhetIdForDB;
         private int funkTestIdForDB;
         private DateTime teststartForDB;
-        private DateTime testsluttForDB;
         private string sprakUrl = "lang=nb";
 
         public LoginTests(DeviceConfig deviceConfig)
@@ -115,8 +110,8 @@ namespace TestSuite
         [OneTimeSetUp]
         public void Init()
         {
-            LogWriter.LogWrite("Starter seleniumtest på en device i " + GlobalVariables.miljo);
-            if(GlobalVariables.ErProd() && GlobalVariables.loggTilDatabase)
+            LogWriter.LogWrite("Starter seleniumtest på en device i " + GlobalVariables.Miljo);
+            if(GlobalVariables.ErProd() && GlobalVariables.ErScheduled() && GlobalVariables.SkalLoggeTilDatabase())
             {
                 enhetIdForDB =  MonitorApiClient.FindOrCreateEnhetOppsett(new EnhetOppsett{
                     enhet = bsCaps.device, nettleserNavn = bsCaps.browser, nettleserVersjon = bsCaps.browserVersion,
@@ -151,7 +146,7 @@ namespace TestSuite
                 resultatTekst = oppsettTekst + ":\n"
                 + TestContext.CurrentContext.Result.FailCount + " test fail, " + TestContext.CurrentContext.Result.PassCount + " test ok\n"
                 + resultatTekst;
-                if(GlobalVariables.ErProd()  && GlobalVariables.loggTilDatabase) // Hvis vanlig monitoreringskjøring
+                if(GlobalVariables.ErProd()  && GlobalVariables.ErScheduled() && GlobalVariables.SkalLoggeTilDatabase())
                 {
                     resultatTekst += "\nKanskje <@joakimbjerkheim> eller <@mathias.meier.nilsen> tar en titt?";
                 }
@@ -177,7 +172,7 @@ namespace TestSuite
         public void AfterEachTest()
         {
             LogWriter.LogToBrowserStack(driver, TestContext.CurrentContext.Test.MethodName + " ferdig.");
-            if(GlobalVariables.ErProd()  && GlobalVariables.loggTilDatabase)
+            if(GlobalVariables.ErProd()  && GlobalVariables.ErScheduled() && GlobalVariables.SkalLoggeTilDatabase())
             {
                 funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
 
@@ -238,7 +233,7 @@ namespace TestSuite
             }
             try
             {
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
+                driver.Navigate().GoToUrl(GlobalVariables.DigilaerUrl);
                 
                 if(GlobalVariables.ErProd())
                 {
@@ -278,7 +273,7 @@ namespace TestSuite
                 if(GlobalVariables.ErProd())
                 {
                     Assert.That(driver.PageSource.ToLower().Contains("muligheter"), Is.True);
-                    driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl + "/nb/om-digilaerno");
+                    driver.Navigate().GoToUrl(GlobalVariables.DigilaerUrl + "/nb/om-digilaerno");
                 }
             } catch(Exception exception)
             {
@@ -450,7 +445,7 @@ namespace TestSuite
                 try
                 {
                     moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
-                } catch(Exception e)
+                } catch(Exception)
                 {
                     retries++;
                     Thread.Sleep(15000);
@@ -823,9 +818,9 @@ namespace TestSuite
         {
             if(GlobalVariables.ErProd())
             {
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl + "/my/index.php?" + sprakUrl);
+                driver.Navigate().GoToUrl(GlobalVariables.DigilaerSkoleUrl + "/my/index.php?" + sprakUrl);
             } else {
-                driver.Navigate().GoToUrl(GlobalVariables.digilaerUrl);
+                driver.Navigate().GoToUrl(GlobalVariables.DigilaerUrl);
             }
 
             Thread.Sleep(2000);
@@ -836,7 +831,7 @@ namespace TestSuite
             {
                 try{
                     agreeKnappeListe[0].Click();
-                } catch(Exception e)
+                } catch(Exception)
                 {
                     LogWriter.LogToBrowserStack(driver, "Aksepter cookies lot se ikke klikke. Antall cookie-knapper: " + agreeKnappeListe.Count);
                 }
@@ -845,7 +840,7 @@ namespace TestSuite
 
         private void GaaTilSkoleDigilaer()
         {
-            driver.Navigate().GoToUrl(GlobalVariables.digilaerSkoleUrl);
+            driver.Navigate().GoToUrl(GlobalVariables.DigilaerSkoleUrl);
             ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("eupopup-button"));
             if(agreeKnappeListe.Count > 0)
             {
@@ -859,7 +854,7 @@ namespace TestSuite
             AapneBrukerMeny();
             driver.FindElement(By.LinkText("Profil")).Click();
             Thread.Sleep(2000);
-            driver.FindElement(By.LinkText("Selenium")).Click();
+            driver.FindElement(By.LinkText(fagkodeSelenium)).Click();
             Thread.Sleep(2000);
             driver.FindElement(By.LinkText("Kurs")).Click();
             HaandterMacSafari();
@@ -912,7 +907,7 @@ namespace TestSuite
             try
             {
                 driver.SwitchTo().Alert().Accept();
-            } catch(Exception e)
+            } catch(Exception)
             {
                 LogWriter.LogToBrowserStack(driver, "Alert håndtering exception catched");
             }
@@ -928,7 +923,7 @@ namespace TestSuite
             GaaTilSkoleDigilaer();
             try {
                 LoggUt();
-            } catch(Exception ex)
+            } catch(Exception)
             {
                 LogWriter.LogWrite("Feilet ved utlogging i håndtering av en feilet test. Var kanskje ikke innlogget?");
             }
