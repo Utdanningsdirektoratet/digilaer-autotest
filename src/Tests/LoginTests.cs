@@ -473,24 +473,47 @@ namespace TestSuite
                 String source = driver.PageSource;
                 Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
 
-                if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
+                try
                 {
-                    driver.FindElement(By.Id("download-app-notifier_1")).Click();
+                    if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
+                    {
+                        driver.FindElement(By.Id("download-app-notifier_1")).Click();
+                    }
+                } catch(WebDriverException e)
+                {
+                    LogWriter.LogWrite("download-app-notifier_1 timeout " + e);
+                    if(!erMacSafari()) {throw e;}
                 }
-
+                 
                 if(driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
                 {
                     driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
                 }
 
-                if(driver.FindElements(By.XPath("//span[.='Display Media']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
+                HaandterMacSafari();
+                try
                 {
-                    driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
+                    if(driver.FindElements(By.XPath("//span[.='Display Media']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
+                    {
+                        driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
+                    }
+                } catch(WebDriverException e)
+                {
+                    LogWriter.LogWrite("Display media " + e);
+                    if(!erMacSafari()) {throw e;}
                 }
 
-                if(driver.FindElements(By.Id("productMaintenanceNotifier_1")).Count > 0 && driver.FindElement(By.Id("productMaintenanceNotifier_1")).Displayed)
+                HaandterMacSafari();
+                try
                 {
-                    driver.FindElement(By.Id("productMaintenanceNotifier_1")).Click();
+                    if(driver.FindElements(By.Id("productMaintenanceNotifier_1")).Count > 0 && driver.FindElement(By.Id("productMaintenanceNotifier_1")).Displayed)
+                    {
+                        driver.FindElement(By.Id("productMaintenanceNotifier_1")).Click();
+                    }
+                } catch(WebDriverException e)
+                {
+                    LogWriter.LogWrite("productMaintenanceNotifier_1 timeout " + e);
+                    if(!erMacSafari()) {throw e;}
                 }
 
                 Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
@@ -512,6 +535,11 @@ namespace TestSuite
             HaandterMacSafari();
 
             LoggUt();
+        }
+
+        private bool erMacSafari()
+        {
+            return bsCaps.browser != null && bsCaps.browser.Equals("Safari") && bsCaps.os != null && bsCaps.os.Equals("OS X");
         }
 
         [Test]
@@ -555,6 +583,7 @@ namespace TestSuite
                     HaandterMacSafari();
                 }
                 
+                Thread.Sleep(2000);
                 driver.FindElement(By.ClassName("fa-play")).Click();
                 Thread.Sleep(500);
                 Assert.True(driver.FindElement(By.ClassName("fa-spinner")).Displayed);
