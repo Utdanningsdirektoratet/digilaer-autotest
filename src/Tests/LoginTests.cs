@@ -758,9 +758,9 @@ namespace TestSuite
                     Thread.Sleep(1000); 
                     Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
 
-                    driver.FindElement(By.ClassName("play-icon")).Click(); // state-paused
+                    driver.FindElement(By.XPath("//button[@aria-label='Play']")).Click();
                     Thread.Sleep(10000); // La video snurre litt
-                    driver.FindElement(By.ClassName("state-playing")).Click();
+                    driver.FindElement(By.XPath("//button[@aria-label='Pause']")).Click();
 
                     driver.SwitchTo().ParentFrame();
                     Thread.Sleep(1000);
