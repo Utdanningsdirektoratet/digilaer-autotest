@@ -1,7 +1,7 @@
 trigger: none
 
 schedules:
-- cron: "30 3 * * *" 
+- cron: "30 4 * * *" 
   always: true
   branches:
     include:
