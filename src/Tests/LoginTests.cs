@@ -649,7 +649,7 @@ namespace TestSuite
                 }
 
                 HaandterMacSafari();
-                IWebElement ordEn = driver.FindElement(By.XPath("//span[.='will']"));
+                IWebElement ordEn = driver.FindElement(By.XPath("//span[starts-with(., 'will')]"));
 
                 IWebElement slippFeltEn = driver.FindElements(By.ClassName("droptarget"))[0]; 
 
