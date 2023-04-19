@@ -313,7 +313,8 @@ namespace TestSuite
             {
                 GaaTilDigilaer();
                 LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
-
+                Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  
+                    "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
                 LoggUt();
             } catch(Exception exception)
             {
@@ -330,6 +331,8 @@ namespace TestSuite
                 GaaTilSkoleDigilaer();
                 HaandterMacSafari();
                 LoggInnMedFeide(studentUnder18Fnr, studentUnder18PW);
+                Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  
+                    "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
                 LoggUt();
             } catch (Exception exception)
             {
@@ -345,6 +348,8 @@ namespace TestSuite
 			{
                 GaaTilSkoleDigilaer();
                 LoggInnMedFeide(facultyEmployeeLaererFnr, facultyEmployeeLaererPW);
+                Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  
+                    "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
                 LoggUt();
             } catch (Exception exception)
             {
@@ -821,8 +826,6 @@ namespace TestSuite
             HaandterSamtykke();
 
             HaandterMacSafari();
-            Assert.That(driver.PageSource.ToLower().Contains("innlogget bruker") || driver.PageSource.ToLower().Contains("velkommen tilbake"), Is.True,  
-                "Brukermeny ble ikke vist, selv om bruker skulle vært innlogget");
         }
 
         private void LoggUt()
