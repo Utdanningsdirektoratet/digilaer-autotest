@@ -28,12 +28,12 @@ namespace Selenium
 
             capability.AddAdditionalCapability("browserstack.video", "true");
             capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
-            capability.AddAdditionalCapability("browserstack.appiumLogs", "true");
-            capability.AddAdditionalCapability("browserstack.debug", "true"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.console", "errors"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.appiumLogs", "false");
+            capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalCapability("browserstack.console", "disable"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
             capability.AddAdditionalCapability("browserstack.consoleLogs", "errors"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.seleniumLogs", "true");
-            capability.AddAdditionalCapability("browserstack.networkLogs", "true");
+            capability.AddAdditionalCapability("browserstack.seleniumLogs", "false");
+            capability.AddAdditionalCapability("browserstack.networkLogs", "false");
 
             capability.AddAdditionalCapability("browserstack.appium_version", "1.22.0"); // 2.0.0
             capability.AddAdditionalCapability("browserstack.user", BrowserStackUsername);
@@ -116,18 +116,25 @@ namespace Selenium
         Win10Chrome,
         Win10Firefox,
         Win10Edge,
+        Win11Chrome,
+        Win11Edge,
         OSXBigSurSafari,
-        OSXBigSurFirefox,
-        OSXBigSurChrome,
-        OSXBigSurEdge,
+        OSXMontereySafari,
+        OSXVenturaSafari,
+        OSXVenturaFirefox,
+        OSXVenturaChrome,
+        OSXVenturaEdge,
         IOSIphone,
         Ipad11Pro2020,
+        Ipad10th,
         AndroidGalaxyS20,
+        AndroidGalaxyS23Ultra,
         AndroidGalaxyTabS7,
         AndroidGalaxyS21,
         AndroidOnePlus9,
+        GooglePixel7Pro,
         GooglePixel6,
         GooglePixel4XL,
-        SamsungGalaxyS10
+        SamsungGalaxyS10,
     }
 }

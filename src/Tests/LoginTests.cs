@@ -16,16 +16,23 @@ using OpenQA.Selenium.Firefox;
 
 namespace TestSuite
 {
-    [TestFixture(DeviceConfig.OSXBigSurEdge)]
-    [TestFixture(DeviceConfig.OSXBigSurChrome)]
-    [TestFixture(DeviceConfig.OSXBigSurFirefox)]
     [TestFixture(DeviceConfig.OSXBigSurSafari)]
-    [TestFixture(DeviceConfig.IOSIphone)]
+    [TestFixture(DeviceConfig.OSXMontereySafari)]
+    [TestFixture(DeviceConfig.OSXVenturaSafari)]
+    [TestFixture(DeviceConfig.OSXVenturaChrome)]
+    [TestFixture(DeviceConfig.OSXVenturaFirefox)]
+    [TestFixture(DeviceConfig.OSXVenturaEdge)]
     [TestFixture(DeviceConfig.Win10Chrome)]
     [TestFixture(DeviceConfig.Win10Firefox)]
-    [TestFixture(DeviceConfig.Win10Edge)] 
-    [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
+    [TestFixture(DeviceConfig.Win10Edge)]
+    [TestFixture(DeviceConfig.Win11Chrome)]
+    [TestFixture(DeviceConfig.Win11Edge)]
+    [TestFixture(DeviceConfig.IOSIphone)]
     [TestFixture(DeviceConfig.Ipad11Pro2020)]
+    [TestFixture(DeviceConfig.Ipad10th)]
+    [TestFixture(DeviceConfig.AndroidGalaxyS23Ultra)]
+    [TestFixture(DeviceConfig.GooglePixel7Pro)]
+    [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
     [TestFixture(DeviceConfig.AndroidGalaxyS21)]
     [TestFixture(DeviceConfig.AndroidOnePlus9)]
     [TestFixture(DeviceConfig.SamsungGalaxyS10)]
@@ -60,24 +67,44 @@ namespace TestSuite
             } else if(deviceConfig == DeviceConfig.Win10Firefox)
             {
                 bsCaps = new BrowserStackCapabilities{os = "Windows", osVersion = "10", browser = "Firefox", browserVersion = "latest"};
+            } else if(deviceConfig == DeviceConfig.Win11Chrome)
+            {
+                bsCaps = new BrowserStackCapabilities{os = "Windows", osVersion = "11", browser = "Chrome", browserVersion = "latest"};
+            } else if(deviceConfig == DeviceConfig.Win11Edge)
+            {
+                bsCaps = new BrowserStackCapabilities{os = "Windows", osVersion = "11", browser = "Edge", browserVersion = "latest"};
             } else if(deviceConfig == DeviceConfig.OSXBigSurSafari)
             {
-                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Safari", browserVersion = "14.1", resolution = "1920x1080"};
-            } else if(deviceConfig == DeviceConfig.OSXBigSurFirefox)
+                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Safari", browserVersion = "latest", resolution = "1920x1080"};
+            } else if(deviceConfig == DeviceConfig.OSXMontereySafari)
             {
-                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Firefox", browserVersion = "99.0", resolution = "1920x1080"};
-            } else if(deviceConfig == DeviceConfig.OSXBigSurChrome)
+                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Monterey", browser = "Safari", browserVersion = "latest", resolution = "1920x1080"};
+            } else if(deviceConfig == DeviceConfig.OSXVenturaSafari)
             {
-                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Chrome", browserVersion = "latest", resolution = "1920x1080"};
-            } else if(deviceConfig == DeviceConfig.OSXBigSurEdge)
+                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Ventura", browser = "Safari", browserVersion = "latest", resolution = "1920x1080"};
+            } else if(deviceConfig == DeviceConfig.OSXVenturaFirefox)
             {
-                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Big Sur", browser = "Edge", browserVersion = "latest", resolution = "1920x1080"};
+                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Ventura", browser = "Firefox", browserVersion = "latest", resolution = "1920x1080"};
+            } else if(deviceConfig == DeviceConfig.OSXVenturaChrome)
+            {
+                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Ventura", browser = "Chrome", browserVersion = "latest", resolution = "1920x1080"};
+            } else if(deviceConfig == DeviceConfig.OSXVenturaEdge)
+            {
+                bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Ventura", browser = "Edge", browserVersion = "latest", resolution = "1920x1080"};
             } else if(deviceConfig == DeviceConfig.Ipad11Pro2020)
             {
                 bsCaps = new BrowserStackCapabilities{device = "iPad Pro 11 2020", browser = "Safari", osVersion = "13", realMobile = "true", local = "false"};
+            } else if(deviceConfig == DeviceConfig.IOSIphone){
+                bsCaps = new BrowserStackCapabilities{device = "iPad 10th", browser = "Safari", osVersion = "16", realMobile = "true", local = "false"};
             } else if(deviceConfig == DeviceConfig.IOSIphone)
             {
-                bsCaps = new BrowserStackCapabilities{device = "iPhone 13", browser = "Safari", osVersion = "15", realMobile = "true"};
+                bsCaps = new BrowserStackCapabilities{device = "iPhone 14", browser = "Safari", osVersion = "16", realMobile = "true"};
+            } else if(deviceConfig == DeviceConfig.AndroidGalaxyS23Ultra)
+            {
+                bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S23 Ultra", browser = "Chrome", osVersion = "13.0", realMobile = "true", local = "false"};
+            } else if(deviceConfig == DeviceConfig.GooglePixel7Pro)
+            {
+                bsCaps = new BrowserStackCapabilities{device = "Pixel 7 Pro", browser = "Chrome", osVersion = "12.0", realMobile = "true", local = "false"};
             } else if(deviceConfig == DeviceConfig.AndroidGalaxyTabS7)
             {
                 bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy Tab S7", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};

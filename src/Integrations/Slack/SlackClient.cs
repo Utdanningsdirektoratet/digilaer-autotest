@@ -10,7 +10,7 @@ namespace Slack
         private static string slackHookUrl = "services/" + System.Environment.GetEnvironmentVariable("DIGI_SLACK_WEBHOOK_PW");
         private static string slackUserName = "Digilær Auto-";
 
-        public static async void CallSlack(string slackText)
+        public static void CallSlack(string slackText)
         {
             HttpClient client = new HttpClient();
             

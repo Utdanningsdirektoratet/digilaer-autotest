@@ -12,7 +12,7 @@ namespace monitor.api
     {
         private static string baseApiUrl = "https://digiliaermonitorapiaf.azurewebsites.net/api/";
 
-        public static async void PingApi()
+        public static void PingApi()
         {
             string content = "";
             HttpClient client = new HttpClient();
