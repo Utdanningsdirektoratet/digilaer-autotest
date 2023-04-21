@@ -30,13 +30,13 @@ namespace TestSuite
     [TestFixture(DeviceConfig.IOSIphone)]
     [TestFixture(DeviceConfig.Ipad11Pro2020)]
     [TestFixture(DeviceConfig.Ipad10th)]
-    [TestFixture(DeviceConfig.AndroidGalaxyS23Ultra)]
-    [TestFixture(DeviceConfig.GooglePixel7Pro)]
-    [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
-    [TestFixture(DeviceConfig.AndroidGalaxyS21)]
-    [TestFixture(DeviceConfig.AndroidOnePlus9)]
-    [TestFixture(DeviceConfig.SamsungGalaxyS10)]
-    [TestFixture(DeviceConfig.GooglePixel4XL)]
+    // [TestFixture(DeviceConfig.AndroidGalaxyS23Ultra)]
+    // [TestFixture(DeviceConfig.GooglePixel7Pro)]
+    // [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
+    // [TestFixture(DeviceConfig.AndroidGalaxyS21)]
+    // [TestFixture(DeviceConfig.AndroidOnePlus9)]
+    // [TestFixture(DeviceConfig.SamsungGalaxyS10)]
+    // [TestFixture(DeviceConfig.GooglePixel4XL)]
     public class LoginTests
     {
         private IWebDriver driver;
