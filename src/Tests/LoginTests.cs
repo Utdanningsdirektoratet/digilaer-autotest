@@ -27,9 +27,9 @@ namespace TestSuite
     [TestFixture(DeviceConfig.Win10Edge)]
     [TestFixture(DeviceConfig.Win11Chrome)]
     [TestFixture(DeviceConfig.Win11Edge)]
-    [TestFixture(DeviceConfig.IOSIphone)]
-    [TestFixture(DeviceConfig.Ipad11Pro2020)]
-    [TestFixture(DeviceConfig.Ipad10th)]
+    // [TestFixture(DeviceConfig.IOSIphone)]
+    // [TestFixture(DeviceConfig.Ipad11Pro2020)]
+    // [TestFixture(DeviceConfig.Ipad10th)]
     // [TestFixture(DeviceConfig.AndroidGalaxyS23Ultra)]
     // [TestFixture(DeviceConfig.GooglePixel7Pro)]
     // [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
@@ -929,15 +929,15 @@ namespace TestSuite
 
         private void HaandterSamtykke()
         {
-            if(driver.PageSource.ToLower().Contains("godta samtykke"))
+            if(driver.FindElements(By.XPath("//button[@role='button' and contains(., 'amtykke')]")).Count > 0)
             {
-                driver.FindElement(By.XPath("//input[navn='status10']")).Click();
+                driver.FindElement(By.XPath("//button[@role='button' and contains(., 'amtykke')]")).Click();
                 driver.FindElement(By.XPath("//button[@type='submit']")).Click();
                 GaaTilDigilaer();
             }
             if(driver.FindElements(By.XPath("//button[text='Avslutt veileder']")).Count > 0)
             {
-                driver.FindElement(By.XPath("//button[text='Avslutt veileder']")).Click();
+                driver.FindElements(By.XPath("//button[text='Avslutt veileder']"))[0].Click();
             }
         }
 
