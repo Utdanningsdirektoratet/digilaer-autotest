@@ -94,7 +94,7 @@ namespace TestSuite
             } else if(deviceConfig == DeviceConfig.Ipad11Pro2020)
             {
                 bsCaps = new BrowserStackCapabilities{device = "iPad Pro 11 2020", browser = "Safari", osVersion = "13", realMobile = "true", local = "false"};
-            } else if(deviceConfig == DeviceConfig.IOSIphone){
+            } else if(deviceConfig == DeviceConfig.Ipad10th){
                 bsCaps = new BrowserStackCapabilities{device = "iPad 10th", browser = "Safari", osVersion = "16", realMobile = "true", local = "false"};
             } else if(deviceConfig == DeviceConfig.IOSIphone)
             {
@@ -476,11 +476,11 @@ namespace TestSuite
             {
                 try
                 {
+                    Thread.Sleep(15000);
                     moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
                 } catch(Exception)
                 {
                     retries++;
-                    Thread.Sleep(15000);
                 }
             }
             if(retries > 0)
