@@ -935,7 +935,8 @@ namespace TestSuite
                 driver.FindElement(By.XPath("//button[@type='submit']")).Click();
                 GaaTilDigilaer();
             }
-            if(driver.FindElements(By.XPath("//button[text='Avslutt veileder']")).Count > 0)
+            if(driver.FindElements(By.XPath("//button[text='Avslutt veileder']")).Count > 0
+                && driver.FindElements(By.XPath("//button[text='Avslutt veileder']"))[0].Displayed)
             {
                 driver.FindElements(By.XPath("//button[text='Avslutt veileder']"))[0].Click();
             }
