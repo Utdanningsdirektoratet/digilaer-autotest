@@ -16,9 +16,9 @@ using OpenQA.Selenium.Firefox;
 
 namespace TestSuite
 {
-    [TestFixture(DeviceConfig.OSXBigSurSafari)]
-    [TestFixture(DeviceConfig.OSXMontereySafari)]
-    [TestFixture(DeviceConfig.OSXVenturaSafari)]
+    // [TestFixture(DeviceConfig.OSXBigSurSafari)]
+    // [TestFixture(DeviceConfig.OSXMontereySafari)]
+    // [TestFixture(DeviceConfig.OSXVenturaSafari)]
     [TestFixture(DeviceConfig.OSXVenturaChrome)]
     [TestFixture(DeviceConfig.OSXVenturaFirefox)]
     [TestFixture(DeviceConfig.OSXVenturaEdge)]
@@ -27,9 +27,9 @@ namespace TestSuite
     [TestFixture(DeviceConfig.Win10Edge)]
     [TestFixture(DeviceConfig.Win11Chrome)]
     [TestFixture(DeviceConfig.Win11Edge)]
-    // [TestFixture(DeviceConfig.IOSIphone)]
-    // [TestFixture(DeviceConfig.Ipad11Pro2020)]
-    // [TestFixture(DeviceConfig.Ipad10th)]
+    [TestFixture(DeviceConfig.IOSIphone)]
+    [TestFixture(DeviceConfig.Ipad11Pro2020)]
+    [TestFixture(DeviceConfig.Ipad10th)]
     // [TestFixture(DeviceConfig.AndroidGalaxyS23Ultra)]
     // [TestFixture(DeviceConfig.GooglePixel7Pro)]
     // [TestFixture(DeviceConfig.AndroidGalaxyTabS7)]
