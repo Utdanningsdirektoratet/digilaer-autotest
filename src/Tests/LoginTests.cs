@@ -851,6 +851,7 @@ namespace TestSuite
             }
 
             HaandterSamtykke();
+            HaandterVeiledning();
 
             HaandterMacSafari();
         }
@@ -939,6 +940,15 @@ namespace TestSuite
                 && driver.FindElements(By.XPath("//button[text='Avslutt veileder']"))[0].Displayed)
             {
                 driver.FindElements(By.XPath("//button[text='Avslutt veileder']"))[0].Click();
+            }
+        }
+
+        private void HaandterVeiledning()
+        {
+          Thread.Sleep(3000);
+          if(driver.FindElements(By.XPath("//button[@role='button' and contains(., 'Hopp over')]")).Count > 0)
+            {
+                driver.FindElement(By.XPath("//button[@role='button' and contains(., 'Hopp over')]")).Click();
             }
         }
 
