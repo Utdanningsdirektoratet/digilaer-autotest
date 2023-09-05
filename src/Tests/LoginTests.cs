@@ -504,7 +504,7 @@ namespace TestSuite
                 driver.SwitchTo().Frame(iFrameAdobe);
                 String source = driver.PageSource;
                 Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
-
+                Thread.Sleep(5000); // Wait for popups
                 try
                 {
                     if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
