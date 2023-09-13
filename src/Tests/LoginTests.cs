@@ -504,24 +504,9 @@ namespace TestSuite
                 driver.SwitchTo().Frame(iFrameAdobe);
                 String source = driver.PageSource;
                 Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
-                Thread.Sleep(5000); // Wait for popups
-                try
-                {
-                    if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
-                    {
-                        driver.FindElement(By.Id("download-app-notifier_1")).Click();
-                    }
-                } catch(WebDriverException e)
-                {
-                    LogWriter.LogWrite("download-app-notifier_1 timeout " + e);
-                    if(!erMacSafari()) {throw e;}
-                }
-                 
-                if(driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
-                {
-                    driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
-                }
 
+                HandleAdobeConnectPopups();
+                
                 HaandterMacSafari();
                 try
                 {
@@ -567,6 +552,28 @@ namespace TestSuite
             HaandterMacSafari();
 
             LoggUt();
+        }
+
+        private void HandleAdobeConnectPopups() {
+          Thread.Sleep(10000); // Wait for popups
+          try
+          {
+              if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
+              {
+                  driver.FindElement(By.Id("download-app-notifier_1")).Click();
+              }
+          } catch(WebDriverException e)
+          {
+              LogWriter.LogWrite("download-app-notifier_1 timeout " + e);
+              if(!erMacSafari()) {throw e;}
+          }
+            
+          for(int i = 0; i < 3; i++) {
+            if(driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
+            {
+                driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
+            }
+          } 
         }
 
         private bool erMacSafari()
