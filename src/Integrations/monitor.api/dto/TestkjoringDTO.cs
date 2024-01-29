@@ -9,6 +9,7 @@ namespace monitor.api.dto
         public int resultatId {get; set;}
         public DateTime starttid {get; set;}
         public DateTime sluttid {get; set;}
+        public int tidbrukt {get; set;}
         public string debugInformasjon {get; set;}
     }
 

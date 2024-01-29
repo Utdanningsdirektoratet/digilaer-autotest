@@ -18,17 +18,20 @@ namespace digilaer_autotest
                         GlobalVariables.SetStageEnv();
                     } else if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("prod"))
                     {
-                        GlobalVariables.SetProdEnv(false);
+                        GlobalVariables.SetProdEnv(false, false);
                     } else if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("test"))
                     {
                         GlobalVariables.SetTestEnv();
                     }
                 } else if(args[0].Equals("chronprod"))
                 {
-                    GlobalVariables.SetProdEnv(true);
+                    GlobalVariables.SetProdEnv(true, false);
                 } else if(args[0].Equals("chronstage"))
                 {
                     GlobalVariables.SetStageEnv();
+                } else if(args[0].Equals("chrontimingprod"))
+                {
+                    GlobalVariables.SetProdEnv(true, true);
                 }
             }
             return new AutoRun().Execute(new string[0]);

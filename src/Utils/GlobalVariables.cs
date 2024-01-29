@@ -12,6 +12,7 @@ namespace Utils
         public static string DigilaerSkoleUrl {get; private set;}
         private static bool LoggTilDatabase;
         private static bool Scheduled = false;
+        private static bool Timing = false;
         private static string SlackChannel {get;}
 
         public static bool ErProd()
@@ -34,6 +35,11 @@ namespace Utils
             return Scheduled;
         }
 
+        public static bool ErTiming()
+        {
+            return Timing;
+        }
+
         public static bool SkalLoggeTilDatabase()
         {
             return LoggTilDatabase;
@@ -47,13 +53,14 @@ namespace Utils
             LoggTilDatabase = false;
         }
 
-        public static void SetProdEnv(bool erScheduled)
+        public static void SetProdEnv(bool erScheduled, bool erTiming)
         {
             Miljo = Miljo.Prod;
             DigilaerUrl = "https://digilaer.no";
             DigilaerSkoleUrl = "https://skole.digilaer.no";
             LoggTilDatabase = System.Environment.GetEnvironmentVariable("DIGI_LOGG_TIL_DB").Equals("true");
             Scheduled = erScheduled;
+            Timing = erTiming;
         }
 
         public static void SetTestEnv()

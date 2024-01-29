@@ -1,0 +1,36 @@
+trigger: none
+
+schedules:
+- cron: "15 11-23 * * *" 
+  always: true
+  branches:
+    include:
+    - main
+  batch: true
+  displayName: Digilær autotest selenium tidtaking
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: run_ui_tests
+  displayName: Run UI Tests timing
+  jobs:
+    - job: build
+      displayName: Build and Test
+      continueOnError: false
+      timeoutInMinutes: 360
+      steps:
+        - task: UseDotNet@2
+          displayName: 'Using dotnet 5.0.x'
+          inputs:
+            packageType: 'sdk'
+            version: '5.0.x'
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Kjør selenium tester skedulert for timing i prod'
+          inputs:
+            command: 'run'
+            arguments: 'chrontimingprod'
+            projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
+          condition: eq(variables['Build.Reason'], 'Schedule')

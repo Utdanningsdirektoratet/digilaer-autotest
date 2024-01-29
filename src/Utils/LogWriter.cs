@@ -6,14 +6,9 @@ using OpenQA.Selenium.Firefox;
 
  namespace Utils 
  {
-    public class LogWriter
+    public static class LogWriter
     {
         private static string exePath = string.Empty;
-       
-        public LogWriter(string logMessage)
-        {
-            LogWrite(logMessage);
-        }
 
         public static void LogToBrowserStack(IWebDriver driver, string logMessage)
         {
@@ -50,6 +45,13 @@ using OpenQA.Selenium.Firefox;
                 textWriter.WriteLine("------------------------------");
             }
             catch (Exception) {}
+        }
+
+        public static string FormatTime(TimeSpan ts)
+        {
+          return String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+              ts.Hours, ts.Minutes, ts.Seconds,
+              ts.Milliseconds / 10);
         }
     }
 }
