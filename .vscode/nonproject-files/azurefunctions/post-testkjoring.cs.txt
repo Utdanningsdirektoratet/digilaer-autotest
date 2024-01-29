@@ -20,13 +20,20 @@ public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
     string resultatId = data?.resultatId;
     string starttid = data?.starttid;
     string sluttid = data?.sluttid;
+    int tidbrukt = 0;
     string debugInformasjon = data?.debugInformasjon;
+
+    if(data?.tidbrukt != null)
+    {
+        tidbrukt = (int) data?.tidbrukt;
+    }
 
     log.LogInformation("funksjonellTestId " + funksjonellTestId);
     log.LogInformation("enhetOppsettId " + enhetOppsettId);
     log.LogInformation("resultatId " + resultatId);
     log.LogInformation("starttid " + starttid);
     log.LogInformation("sluttid " + sluttid);
+    log.LogInformation("tidbrukt " + tidbrukt);
     log.LogInformation("debugInformasjon " + debugInformasjon);
 
     try
@@ -35,8 +42,8 @@ public static async Task<IActionResult> Run(HttpRequest req, ILogger log)
         {
             connection.Open();
 
-            var queryInsertTestkjoring = @"INSERT INTO dbo.Testkjoring (FunksjonellTest_Id, Enhet_Id, Resultat_Id, Starttid, Sluttid, DebugInformasjon) VALUES ('"
-            + funksjonellTestId + "', '" + enhetOppsettId + "', '" + resultatId  + "', '" + starttid + "', '" + sluttid + "', '" + debugInformasjon +
+            var queryInsertTestkjoring = @"INSERT INTO dbo.Testkjoring (FunksjonellTest_Id, Enhet_Id, Resultat_Id, Starttid, Sluttid, Tidbrukt, DebugInformasjon) VALUES ('"
+            + funksjonellTestId + "', '" + enhetOppsettId + "', '" + resultatId  + "', '" + starttid + "', '" + sluttid + "', '" + tidbrukt + "', '" + debugInformasjon +
             "'); SELECT MAX(ID) FROM dbo.Testkjoring;";
 
             SqlCommand command = new SqlCommand(queryInsertTestkjoring, connection);

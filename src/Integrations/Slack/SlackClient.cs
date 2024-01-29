@@ -14,8 +14,15 @@ namespace Slack
         {
             HttpClient client = new HttpClient();
             
-            string slackEmoji =  ":digilaer:"; 
-            string slackChannel = "#autotest_digilær_" + (GlobalVariables.ErTest() ? "stage" : GlobalVariables.Miljo);
+            string slackEmoji =  ":digilaer:";
+            string slackChannel = "#";
+            if(GlobalVariables.ErProd())
+            {
+                slackChannel += System.Environment.GetEnvironmentVariable("DIGI_SLACK_CH_PROD");
+            } else 
+            {
+              slackChannel += System.Environment.GetEnvironmentVariable("DIGI_SLACK_CH_STAGE");
+            }
 
             string content = "{\"channel\" : \"" + slackChannel + "\", \"username\": \"" + slackUserName + GlobalVariables.Miljo + "\", \"text\": \""+ slackText +"\", \"icon_emoji\": \"" + slackEmoji + "\"}";
             client.BaseAddress = new System.Uri(baseSlackUrl);

@@ -12,7 +12,9 @@ namespace Selenium
         private static string BrowserStackUsername = System.Environment.GetEnvironmentVariable("DIGI_BS_USER");
         private static string BrowserStackKey = System.Environment.GetEnvironmentVariable("DIGI_BS_KEY");
         private static int TimeoutSekunder = 10;
-        public IWebDriver GetBrowserstackDriver(BrowserStackCapabilities bsCaps)
+        private static IWebDriver driver;
+
+        public static IWebDriver GetBrowserstackDriver(BrowserStackCapabilities bsCaps)
         {
             DriverOptions capability = new OpenQA.Selenium.Edge.EdgeOptions();
 
@@ -91,7 +93,7 @@ namespace Selenium
         }
 
         // For lokal testing
-        public IWebDriver GetFirefoxDriver()
+        public static IWebDriver GetFirefoxDriver()
         {
             IWebDriver driver = new FirefoxDriver();
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeoutSekunder);
