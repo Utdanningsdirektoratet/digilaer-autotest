@@ -90,41 +90,41 @@ namespace TestSuite
                   bsCaps = new BrowserStackCapabilities{os = "OS X", osVersion = "Ventura", browser = "Edge", browserVersion = "latest", resolution = "1920x1080"};
               } else if(deviceConfig == DeviceConfig.Ipad11Pro2020)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "iPad Pro 11 2020", browser = "Safari", osVersion = "13", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "IOS", device = "iPad Pro 11 2020", browser = "Safari", osVersion = "13", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.Ipad10th){
-                  bsCaps = new BrowserStackCapabilities{device = "iPad 10th", browser = "Safari", osVersion = "16", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "IOS", device = "iPad 10th", browser = "Safari", osVersion = "16", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.IOSIphone)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "iPhone 14", browser = "Safari", osVersion = "16", realMobile = "true"};
+                  bsCaps = new BrowserStackCapabilities{os = "IOS", device = "iPhone 14", browser = "Safari", osVersion = "16", realMobile = "true"};
               } else if(deviceConfig == DeviceConfig.AndroidGalaxyS23Ultra)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S23 Ultra", browser = "Chrome", osVersion = "13.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Samsung Galaxy S23 Ultra", browser = "Chrome", osVersion = "13.0", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.GooglePixel7Pro)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "Pixel 7 Pro", browser = "Chrome", osVersion = "12.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Pixel 7 Pro", browser = "Chrome", osVersion = "12.0", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.AndroidGalaxyTabS7)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy Tab S7", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Samsung Galaxy Tab S7", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
               }
               else if(deviceConfig == DeviceConfig.AndroidGalaxyS20)
               {
                   // OBS: Frarådet å bruke denne fra bstack support da den i følge dem er ustabil.
-                  bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S20", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Samsung Galaxy S20", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.AndroidGalaxyS21)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S21", browser = "Chrome", osVersion = "11.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Samsung Galaxy S21", browser = "Chrome", osVersion = "11.0", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.AndroidOnePlus9)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "OnePlus 9", browser = "Chrome", osVersion = "11.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "OnePlus 9", browser = "Chrome", osVersion = "11.0", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.GooglePixel6)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "Google Pixel 6", browser = "Chrome", osVersion = "12.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Google Pixel 6", browser = "Chrome", osVersion = "12.0", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.SamsungGalaxyS10)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "Samsung Galaxy S10", browser = "Chrome", osVersion = "9.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Samsung Galaxy S10", browser = "Chrome", osVersion = "9.0", realMobile = "true", local = "false"};
               } else if(deviceConfig == DeviceConfig.GooglePixel4XL)
               {
-                  bsCaps = new BrowserStackCapabilities{device = "Google Pixel 4 XL", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
+                  bsCaps = new BrowserStackCapabilities{os = "Android", device = "Google Pixel 4 XL", browser = "Chrome", osVersion = "10.0", realMobile = "true", local = "false"};
               }
 
             // driver = SeleniumSetup.GetFirefoxDriver();  // For lokal testing
