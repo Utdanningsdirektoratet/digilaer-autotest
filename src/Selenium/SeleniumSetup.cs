@@ -34,7 +34,7 @@ namespace Selenium
             capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
             capability.AddAdditionalCapability("browserstack.console", "disable"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
             capability.AddAdditionalCapability("browserstack.consoleLogs", "errors"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.seleniumLogs", "false");
+            capability.AddAdditionalCapability("browserstack.seleniumLogs", "true");
             capability.AddAdditionalCapability("browserstack.networkLogs", "false");
 
             capability.AddAdditionalCapability("browserstack.appium_version", "1.22.0"); // 2.0.0
