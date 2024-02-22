@@ -229,7 +229,7 @@ namespace Utils
             try
             {
                 Thread.Sleep(15000);
-                moteUrl = driver.FindElement(By.XPath("//input[@value='Join Meeting']")).GetAttribute("onclick");
+                moteUrl = driver.FindElement(By.XPath("//input[@value='Delta i møte']")).GetAttribute("onclick");
             } catch(Exception)
             {
                 retries++;
