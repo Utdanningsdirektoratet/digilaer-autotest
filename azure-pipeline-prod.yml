@@ -40,5 +40,5 @@ stages:
           inputs:
             command: 'run'
             arguments: 'manuellprod'
-            projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'    
+            projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
           condition: ne(variables['Build.Reason'], 'Schedule')
