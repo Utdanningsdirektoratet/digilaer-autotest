@@ -1,0 +1,44 @@
+trigger: none
+
+schedules:
+- cron: "0 9 * * *" 
+  always: true
+  branches:
+    include:
+    - main
+  batch: true
+  displayName: Digilær autotest selenium stage
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: run_ui_tests
+  displayName: Run UI Tests
+  jobs:
+    - job: build
+      displayName: Build and Test
+      continueOnError: false
+      timeoutInMinutes: 360
+      steps:
+        - task: UseDotNet@2
+          displayName: 'Using dotnet 5.0.x'
+          inputs:
+            packageType: 'sdk'
+            version: '5.0.x'
+          
+        - task: DotNetCoreCLI@2
+          displayName: 'Kjør selenium tester skedulert for stage'
+          inputs:
+            command: 'run'
+            arguments: 'chronstage'
+            projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'
+          condition: eq(variables['Build.Reason'], 'Schedule')
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Kjør selenium tester stage manuell trigging'
+          inputs:
+            command: 'run'
+            arguments: 'manuellstage'
+            projects: '$(System.DefaultWorkingDirectory)/digilaer-autotest.csproj'    
+          condition: ne(variables['Build.Reason'], 'Schedule')

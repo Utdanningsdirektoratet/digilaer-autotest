@@ -10,19 +10,12 @@ namespace digilaer_autotest
         {
             if(args != null && args.Length > 0)
             {
-                if(args[0].Equals("manuell"))
+                if(args[0].Equals("manuellprod"))
                 {
-                    // Manuell kjøring styres med miljøvariabel
-                    if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("stage"))
-                    {
-                        GlobalVariables.SetStageEnv();
-                    } else if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("prod"))
-                    {
-                        GlobalVariables.SetProdEnv(false, false);
-                    } else if(System.Environment.GetEnvironmentVariable("DIGI_MANUAL_RUN_ENV").Equals("test"))
-                    {
-                        GlobalVariables.SetTestEnv();
-                    }
+                  GlobalVariables.SetProdEnv(false, false);
+                } else if(args[0].Equals("manuellstage"))
+                {
+                  GlobalVariables.SetStageEnv();
                 } else if(args[0].Equals("chronprod"))
                 {
                     GlobalVariables.SetProdEnv(true, false);
