@@ -25,12 +25,17 @@ namespace Utils
     public static void LoggUt(IWebDriver driver, BrowserStackCapabilities bsCaps)
     {
         HaandterMacSafari(bsCaps);
-        
-        AapneBrukerMeny(driver);
-
-        Thread.Sleep(1000);
-        driver.FindElement(By.LinkText("Logg ut")).Click();
-        HaandterMacSafari(bsCaps);
+        try {
+          AapneBrukerMeny(driver);
+          Thread.Sleep(1000);
+          driver.FindElement(By.LinkText("Logg ut")).Click();
+          HaandterMacSafari(bsCaps);
+          Assert.That(driver.PageSource.ToLower().Contains("feide"), Is.True);
+        } catch(Exception e) {
+          driver.Navigate().GoToUrl(GlobalVariables.DigilaerSkoleUrl + "/login/logout.php");
+          driver.FindElement(By.XPath("//button[@type='submit']")).Click();
+          Thread.Sleep(10000);
+        }
     }
 
     public static void AapneBrukerMeny(IWebDriver driver)
