@@ -48,8 +48,8 @@ namespace Utils
         public static void SetStageEnv()
         {
             Miljo = Miljo.Stage;
-            DigilaerUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
-            DigilaerSkoleUrl = "https://moodle-stage.udir.c.bitbit.net/my"; 
+            DigilaerUrl = "https://moodle-stage.udir.c.bitbit.net/my/"; 
+            DigilaerSkoleUrl = "https://moodle-stage.udir.c.bitbit.net/my/"; 
             LoggTilDatabase = false;
         }
 
@@ -66,8 +66,8 @@ namespace Utils
         public static void SetTestEnv()
         {
             Miljo = Miljo.Test;
-            DigilaerUrl = "https://moodle-test.udir.c.bitbit.net/my";
-            DigilaerSkoleUrl = "https://moodle-test.udir.c.bitbit.net/my";
+            DigilaerUrl = "https://moodle-test.udir.c.bitbit.net/my/";
+            DigilaerSkoleUrl = "https://moodle-test.udir.c.bitbit.net/my/";
             LoggTilDatabase =   false;
         }
     }
