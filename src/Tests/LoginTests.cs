@@ -714,10 +714,18 @@ namespace TestSuite
                   driver.SwitchTo().Frame(iFrameVimeo);
                   Thread.Sleep(1000); 
                   Assert.IsTrue(driver.FindElement(By.XPath("/html/body")).Displayed);
-
-                  driver.FindElement(By.XPath("//button[@aria-label='Play']")).Click();
-                  Thread.Sleep(300); // La video snurre litt
-                  driver.FindElement(By.XPath("//button[@aria-label='Pause']")).Click();
+                  
+                  try
+                  {
+                    driver.FindElement(By.XPath("//button[@aria-label='Play']")).Click();
+                    Thread.Sleep(300); // La video snurre litt
+                    driver.FindElement(By.XPath("//button[@aria-label='Pause']")).Click();
+                  } catch(Exception e)
+                  {
+                    driver.FindElement(By.XPath("//span[.='Play']/..")).Click();
+                    Thread.Sleep(300); // La video snurre litt
+                    driver.FindElement(By.XPath("//span[.='Pause']/..")).Click();
+                  }
 
                   driver.SwitchTo().ParentFrame();
                   Thread.Sleep(1000);
