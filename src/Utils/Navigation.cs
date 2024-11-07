@@ -324,6 +324,16 @@ namespace Utils
           LogWriter.LogWrite("download-app-notifier_1 timeout " + e);
           if(!erMacSafari(bsCaps)) {throw e;}
       }
+      try
+      {
+          if(driver.FindElements(By.XPath("//span[.='Display Media']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
+          {
+              driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
+          }
+      } catch(WebDriverException e)
+      {
+          LogWriter.LogWrite("Display media " + e);
+      }
 
       for(int i = 0; i < 3; i++) {
         if(driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
