@@ -265,30 +265,6 @@ namespace Utils
             HandleAdobeConnectPopups(driver, bsCaps);
             
             HaandterMacSafari(bsCaps);
-            try
-            {
-                if(driver.FindElements(By.XPath("//span[.='Display Media']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
-                {
-                    driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
-                }
-            } catch(WebDriverException e)
-            {
-                LogWriter.LogWrite("Display media " + e);
-                if(!erMacSafari(bsCaps)) {throw e;}
-            }
-
-            HaandterMacSafari(bsCaps);
-            try
-            {
-                if(driver.FindElements(By.Id("productMaintenanceNotifier_1")).Count > 0 && driver.FindElement(By.Id("productMaintenanceNotifier_1")).Displayed)
-                {
-                    driver.FindElement(By.Id("productMaintenanceNotifier_1")).Click();
-                }
-            } catch(WebDriverException e)
-            {
-                LogWriter.LogWrite("productMaintenanceNotifier_1 timeout " + e);
-                if(!erMacSafari(bsCaps)) {throw e;}
-            }
 
             Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
             
@@ -313,32 +289,49 @@ namespace Utils
 
   	public static void HandleAdobeConnectPopups(IWebDriver driver, BrowserStackCapabilities bsCaps) {
       Thread.Sleep(10000); // Wait for popups
-      try
-      {
+      for(int i = 0; i < 5; i++) {
+        try
+        {
           if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
           {
-              driver.FindElement(By.Id("download-app-notifier_1")).Click();
+            driver.FindElement(By.Id("download-app-notifier_1")).Click();
           }
-      } catch(WebDriverException e)
-      {
+        } catch(WebDriverException e)
+        {
           LogWriter.LogWrite("download-app-notifier_1 timeout " + e);
-          if(!erMacSafari(bsCaps)) {throw e;}
-      }
-      try
-      {
+        }
+        try
+        {
+
           if(driver.FindElements(By.XPath("//span[.='Display Media']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
           {
               driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
           }
-      } catch(WebDriverException e)
-      {
-          LogWriter.LogWrite("Display media " + e);
-      }
-
-      for(int i = 0; i < 3; i++) {
-        if(driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
+        } catch(WebDriverException e)
         {
-            driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
+            LogWriter.LogWrite("Display media " + e);
+        }
+
+        for(int j = 0; j < 2; j++) {
+          try {
+            if(driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
+            {
+                driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
+            }
+          } catch(WebDriverException e)
+          {
+            LogWriter.LogWrite("Close " + e);
+          }
+        }
+        try
+        {
+          if(driver.FindElements(By.Id("productMaintenanceNotifier_1")).Count > 0 && driver.FindElement(By.Id("productMaintenanceNotifier_1")).Displayed)
+          {
+            driver.FindElement(By.Id("productMaintenanceNotifier_1")).Click();
+          }
+        } catch(WebDriverException e)
+        {
+          LogWriter.LogWrite("productMaintenanceNotifier_1 timeout " + e);
         }
       }
     }
