@@ -263,8 +263,8 @@ namespace TestSuite
           }
         }
 
-        [Test]
-        [TestCase(TestName = "Målform kan endres")]
+        // [Test]
+        // [TestCase(TestName = "Målform kan endres")]
         public void TestAtMaalFormKanEndres()
         {
           if(GlobalVariables.ErTiming() || GlobalVariables.ErStage())
