@@ -1,20 +1,13 @@
 trigger: none
 
 schedules:
-- cron: "0 9 * * 0,1,2,3,5,6" 
+- cron: "0 9 * * *" 
   always: true
   branches:
     include:
     - main
   batch: true
   displayName: Digilær autotest selenium stage
-- cron: "30 12 * * 4" 
-  always: true
-  branches:
-    include:
-    - main
-  batch: true
-  displayName: Digilær autotest selenium stage torsdager
 
 pool:
   vmImage: ubuntu-latest
