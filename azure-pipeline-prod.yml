@@ -22,10 +22,10 @@ stages:
       timeoutInMinutes: 360
       steps:
         - task: UseDotNet@2
-          displayName: 'Using dotnet 5.0.x'
+          displayName: 'Using dotnet 8.0.x'
           inputs:
             packageType: 'sdk'
-            version: '5.0.x'
+            version: '8.0.x'
 
         - task: DotNetCoreCLI@2
           displayName: 'Kjør selenium tester skedulert for prod'

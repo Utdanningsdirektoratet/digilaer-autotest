@@ -2,18 +2,19 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <StartupObject>digilaer_autotest.Program</StartupObject>
     <RootNamespace>digilaer_autotest</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>
-    <PackageReference Include="Selenium.WebDriver" Version="3.141.0"/>
-    <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.29.1" />
-    <PackageReference Include="NUnit" Version="3.12.0"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1"/>
-    <PackageReference Include="NUnitLite" Version="3.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
+    <PackageReference Include="Selenium.WebDriver" Version="4.20.0"/>
+    <PackageReference Include="Selenium.Support" Version="4.20.0"/>
+    <PackageReference Include="NUnit" Version="3.14.0"/>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0"/>
+    <PackageReference Include="NUnitLite" Version="3.14.0" />
+    <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.33.0" />
   </ItemGroup>
 
 </Project>

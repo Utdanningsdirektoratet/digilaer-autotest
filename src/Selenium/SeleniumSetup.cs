@@ -18,35 +18,31 @@ namespace Selenium
         {
             DriverOptions capability = new OpenQA.Selenium.Edge.EdgeOptions();
 
-            capability.AddAdditionalCapability("os", bsCaps.os);
-            capability.AddAdditionalCapability("os_version", bsCaps.osVersion);
-            capability.AddAdditionalCapability("resolution", bsCaps.resolution);
-            capability.AddAdditionalCapability("browser", bsCaps.browser);
-            capability.AddAdditionalCapability("device", bsCaps.device);
-            capability.AddAdditionalCapability("browser_version", bsCaps.browserVersion);
-            capability.AddAdditionalCapability("name", "Test med " + GetNameString(bsCaps));
-            capability.AddAdditionalCapability("build", GetBuildString(bsCaps));
-            capability.AddAdditionalCapability("browserstack.local", bsCaps.local);
-
-            capability.AddAdditionalCapability("browserstack.video", "true");
-            capability.AddAdditionalCapability("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
-            capability.AddAdditionalCapability("browserstack.appiumLogs", "false");
-            capability.AddAdditionalCapability("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.console", "disable"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.consoleLogs", "errors"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
-            capability.AddAdditionalCapability("browserstack.seleniumLogs", "true");
-            capability.AddAdditionalCapability("browserstack.networkLogs", "false");
-
-            capability.AddAdditionalCapability("browserstack.appium_version", "1.22.0"); // 2.0.0
-            capability.AddAdditionalCapability("browserstack.user", BrowserStackUsername);
-            capability.AddAdditionalCapability("browserstack.key", BrowserStackKey);
+            capability.AddAdditionalOption("os", bsCaps.os);
+            capability.AddAdditionalOption("os_version", bsCaps.osVersion);
+            capability.AddAdditionalOption("resolution", bsCaps.resolution);
+            capability.AddAdditionalOption("browser", bsCaps.browser);
+            capability.AddAdditionalOption("device", bsCaps.device);
+            capability.AddAdditionalOption("browser_version", bsCaps.browserVersion);
+            capability.AddAdditionalOption("name", "Test med " + GetNameString(bsCaps));
+            capability.AddAdditionalOption("build", GetBuildString(bsCaps));
+            capability.AddAdditionalOption("browserstack.local", bsCaps.local);
+            capability.AddAdditionalOption("browserstack.video", "true");
+            capability.AddAdditionalOption("browserstack.maskCommands", "setValues, getValues, setCookies, getCookies");
+            capability.AddAdditionalOption("browserstack.appiumLogs", "false");
+            capability.AddAdditionalOption("browserstack.debug", "false"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalOption("browserstack.console", "disable"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalOption("browserstack.consoleLogs", "errors"); // FF gir feilmelding: "Invalid moz:firefoxOptions field browserstack.debug
+            capability.AddAdditionalOption("browserstack.seleniumLogs", "true");
+            capability.AddAdditionalOption("browserstack.networkLogs", "false");
+            capability.AddAdditionalOption("browserstack.appium_version", "1.22.0"); // 2.0.0
 
             if(bsCaps.device != null)
             {
-                capability.AddAdditionalCapability("browserstack.autoAcceptAlerts", "true");
+                capability.AddAdditionalOption("browserstack.autoAcceptAlerts", "true");
             }
 
-            IWebDriver driver = new RemoteWebDriver(new Uri("http://hub-cloud.browserstack.com/wd/hub"), capability);
+            IWebDriver driver = new RemoteWebDriver(new Uri($"http://{BrowserStackUsername}:{BrowserStackKey}@hub-cloud.browserstack.com/wd/hub"), capability);
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(15);
 
             return driver;
