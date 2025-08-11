@@ -25,24 +25,27 @@ namespace Utils
     public static void LoggUt(IWebDriver driver, BrowserStackCapabilities bsCaps)
     {
         HaandterMacSafari(bsCaps);
-        try {
-          AapneBrukerMeny(driver);
-          Thread.Sleep(1000);
-          driver.FindElement(By.LinkText("Logg ut")).Click();
-          HaandterMacSafari(bsCaps);
-          Assert.That(driver.PageSource.ToLower().Contains("feide"), Is.True);
-        } catch(Exception e) {
-          driver.Navigate().GoToUrl(GlobalVariables.DigilaerSkoleUrl + "/login/logout.php");
-          driver.FindElement(By.XPath("//button[@type='submit']")).Click();
-          Thread.Sleep(10000);
+        AapneBrukerMeny(driver);
+        Thread.Sleep(1000);
+        driver.FindElement(By.LinkText("Logg ut")).Click();
+        HaandterMacSafari(bsCaps);
+        Thread.Sleep(3000);
+        Assert.That(driver.PageSource.ToLower().Contains("feide"), Is.True);
+        driver.Navigate().GoToUrl("https://" + System.Environment.GetEnvironmentVariable("DIGI_EXTERNAL_LOGIN") + "/login/?ReturnTo=https%3A//kunde." + System.Environment.GetEnvironmentVariable("DIGI_PROVIDER") + "/&IdP=https://idp." + System.Environment.GetEnvironmentVariable("DIGI_PROVIDER"));
+        Thread.Sleep(5000);
+        if (driver.FindElements(By.XPath("//button[.='Yes, continue']")).Count > 0)
+        {
+          driver.FindElement(By.XPath("//button[.='Yes, continue']")).Click();
         }
+        Thread.Sleep(2000);
+        driver.Navigate().GoToUrl("https://" + System.Environment.GetEnvironmentVariable("DIGI_EXTERNAL_LOGIN") + "/logout/?ReturnTo=https%3A//kunde." + System.Environment.GetEnvironmentVariable("DIGI_PROVIDER") + "/utlogget/");
     }
 
     public static void AapneBrukerMeny(IWebDriver driver)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(2000);
         driver.FindElement(By.Id("user-menu-toggle")).Click();
-        Thread.Sleep(1000);
+        Thread.Sleep(2000);
     }
 
     public static void HaandterMacSafari(BrowserStackCapabilities bsCaps)
@@ -83,7 +86,7 @@ namespace Utils
 
     public static void HaandterAlert(IWebDriver driver)
     {
-      Thread.Sleep(2000);
+      Thread.Sleep(5000);
       try
       {
           driver.SwitchTo().Alert().Accept();
@@ -97,9 +100,9 @@ namespace Utils
     {
         driver.Navigate().GoToUrl(GlobalVariables.DigilaerSkoleUrl);
         ReadOnlyCollection<IWebElement> agreeKnappeListe = driver.FindElements(By.ClassName("eupopup-button"));
-        if(agreeKnappeListe.Count > 0)
-        {
-            agreeKnappeListe[0].Click();
+      if (agreeKnappeListe.Count > 0 && agreeKnappeListe[0].Enabled && agreeKnappeListe[0].Displayed)
+      {
+        	agreeKnappeListe[0].Click();
         }
     }
 
@@ -126,15 +129,23 @@ namespace Utils
         }
 
         HaandterMacSafari(bsCaps);
-        Thread.Sleep(2000);
+        Thread.Sleep(4000);
+      
+      if (driver.FindElements(By.Id("forget-accounts")).Count > 0)
+      {
+        driver.FindElement(By.Id("forget-accounts")).Click();
+        Thread.Sleep(1000);
+        driver.FindElement(By.XPath("//i[@class='icon']")).Click();
+      }
 
-        if(driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
-        {
-            IWebElement orgSelector = driver.FindElement(By.Id("org_selector_filter"));
-            orgSelector.SendKeys("Utdanningsdirektoratet - systemorganisasjon"); // For testing mot dataporten: Bruk "Tjenesteleverandør"
-            driver.FindElement(By.XPath("//span[.='Utdanningsdirektoratet - systemorganisasjon']")).Click();
-            driver.FindElement(By.Id("selectorg_button")).Click();
-        }
+
+        if (driver.FindElements(By.Id("username")).Count == 0 || !driver.FindElement(By.Id("username")).Displayed)
+      {
+        IWebElement orgSelector = driver.FindElement(By.Id("org_selector_filter"));
+        orgSelector.SendKeys("Utdanningsdirektoratet - systemorganisasjon"); // For testing mot dataporten: Bruk "Tjenesteleverandør"
+        driver.FindElement(By.XPath("//span[.='Utdanningsdirektoratet - systemorganisasjon']")).Click();
+        driver.FindElement(By.Id("selectorg_button")).Click();
+      }
 
         HaandterMacSafari(bsCaps);
         driver.FindElement(By.Id("username")).SendKeys(brukernavn);
