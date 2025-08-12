@@ -242,14 +242,14 @@ namespace Utils
         HaandterMacSafari(bsCaps);
         while(moteUrl == null && retries < 5)
         {
-            try
-            {
-                Thread.Sleep(15000);
-                moteUrl = driver.FindElement(By.XPath("//input[@value='Delta i møte']")).GetAttribute("onclick");
-            } catch(Exception)
-            {
-                retries++;
-            }
+          try
+          {
+              Thread.Sleep(15000);
+              moteUrl = driver.FindElement(By.XPath("//input[@value='Delta i møte']")).GetAttribute("onclick");
+          } catch(Exception)
+          {
+              retries++;
+          }
         }
         if(retries > 0)
         {
@@ -258,39 +258,36 @@ namespace Utils
             Assert.Warn("Adobeconnect test gikk videre etter retry");
         }
 
-        int moteUrlLengde = moteUrl.IndexOf("'", (moteUrl.IndexOf("'")) + 1) - moteUrl.IndexOf("'") - 1;
+        int moteUrlLengde = moteUrl.IndexOf("'", moteUrl.IndexOf("'") + 1) - moteUrl.IndexOf("'") - 1;
         moteUrl = moteUrl.Substring(moteUrl.IndexOf("'") + 1, moteUrlLengde);
         driver.Navigate().GoToUrl(moteUrl);
         Thread.Sleep(15000); // Lang lastetid og flere redirects
 
-        if(bsCaps.realMobile == null)
+        if (bsCaps.realMobile == null)
         {
-            IWebElement iFrameAdobe = driver.FindElement(By.Id("html-meeting-frame"));
+          IWebElement iFrameAdobe = driver.FindElement(By.Id("html-meeting-frame"));
 
-            Assert.IsTrue(iFrameAdobe.Displayed);
+          Assert.IsTrue(iFrameAdobe.Displayed);
+          driver.SwitchTo().Frame(iFrameAdobe);
+          String source = driver.PageSource;
+          Assert.True(source.Contains("Enter room"), "Siden inneholder ikke 'Enter room'");
+          HandleAdobeConnectPopups(driver, bsCaps);
+          HaandterMacSafari(bsCaps);
 
-            driver.SwitchTo().Frame(iFrameAdobe);
-            String source = driver.PageSource;
-            Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
-
-            HandleAdobeConnectPopups(driver, bsCaps);
-            
-            HaandterMacSafari(bsCaps);
-
-            Assert.True(source.Contains("meetingAreaCanvas"), "Siden inneholder ikke meetingAreaCanvas");
-            
-            driver.SwitchTo().ParentFrame();
-        } else
-        {
-            // TODO: Implementer hvis støttet fra driver:
-            // Thread.Sleep(10000);
-            // if(driver.FindElements(By.XPath("//*[text='Open in Browser']")).Count > 0) {
-            //     driver.FindElement(By.XPath("//*[text='Open in Browser']")).Click();
-            //     Thread.Sleep(10000);
-            // } else {
-            //     Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));       
-            // }
+          Assert.True(source.Contains("Enter room"), "Siden inneholder ikke 'Enter room'");
+          driver.SwitchTo().ParentFrame(); 
         }
+      else
+      {
+        // TODO: Implementer hvis støttet fra driver:
+        // Thread.Sleep(10000);
+        // if(driver.FindElements(By.XPath("//*[text='Open in Browser']")).Count > 0) {
+        //     driver.FindElement(By.XPath("//*[text='Open in Browser']")).Click();
+        //     Thread.Sleep(10000);
+        // } else {
+        //     Assert.True(driver.PageSource.Contains("Use the mobile app to join a room"));       
+        // }
+      }
         GaaTilDigilaer(driver);
         HaandterAlert(driver);
         HaandterMacSafari(bsCaps);
@@ -303,7 +300,7 @@ namespace Utils
       for(int i = 0; i < 5; i++) {
         try
         {
-          if(driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
+          if (driver.FindElements(By.Id("download-app-notifier_1")).Count > 0 && driver.FindElement(By.Id("download-app-notifier_1")).Displayed)
           {
             driver.FindElement(By.Id("download-app-notifier_1")).Click();
           }
@@ -313,7 +310,6 @@ namespace Utils
         }
         try
         {
-
           if(driver.FindElements(By.XPath("//span[.='Display Media']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Display Media']")).Displayed)
           {
               driver.FindElement(By.XPath("//span[.='Display Media']")).FindElement(By.XPath("./..")).Click();
@@ -325,9 +321,9 @@ namespace Utils
 
         for(int j = 0; j < 2; j++) {
           try {
-            if(driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
+            if (driver.FindElements(By.XPath("//span[.='Close']")).Count > 0 && driver.FindElement(By.XPath("//span[.='Close']")).Displayed)
             {
-                driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
+              driver.FindElement(By.XPath("//span[.='Close']")).FindElement(By.XPath("./..")).Click();
             }
           } catch(WebDriverException e)
           {
@@ -336,7 +332,7 @@ namespace Utils
         }
         try
         {
-          if(driver.FindElements(By.Id("productMaintenanceNotifier_1")).Count > 0 && driver.FindElement(By.Id("productMaintenanceNotifier_1")).Displayed)
+          if (driver.FindElements(By.Id("productMaintenanceNotifier_1")).Count > 0 && driver.FindElement(By.Id("productMaintenanceNotifier_1")).Displayed)
           {
             driver.FindElement(By.Id("productMaintenanceNotifier_1")).Click();
           }
