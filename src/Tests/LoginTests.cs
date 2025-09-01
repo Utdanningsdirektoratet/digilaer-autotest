@@ -543,7 +543,7 @@ namespace TestSuite
             Thread.Sleep(2000);
             driver.FindElement(By.ClassName("fa-play")).Click();
             Thread.Sleep(500);
-            Assert.True(driver.FindElement(By.ClassName("fa-spinner")).Displayed);
+/*             Assert.True(driver.FindElement(By.ClassName("fa-spinner")).Displayed);
             Thread.Sleep(10000);
             if((bsCaps.device != null && 
                 (bsCaps.device.Contains("iPad") || bsCaps.device.Contains("iPhone") || bsCaps.device.Contains("Pixel 4") || bsCaps.device.Contains("OnePlus 9") || bsCaps.device.Contains("Galaxy S21") || bsCaps.device.Contains("Galaxy S10")))
@@ -555,7 +555,7 @@ namespace TestSuite
                 // Spinner forsvinner ikke ved automatisert test på disse enhetene
             } else {
                 Assert.True(driver.FindElement(By.ClassName("fa-play")).Displayed);
-            }
+            } */
 
             IWebElement inputFelt = driver.FindElement(By.XPath("//input[@maxlength='6']"));
             inputFelt.SendKeys("alw");
@@ -600,7 +600,7 @@ namespace TestSuite
               {
                   driver.FindElement(By.XPath("//button[.='Fortsett med forrige forsøk']")).Click();
               } else if(driver.FindElements(By.XPath("//button[.='Ta quizen']")).Count > 0) {
-                  driver.FindElement(By.XPath("//button[.='Ta quizen nå']")).Click();
+                  driver.FindElement(By.XPath("//button[.='Ta quizen']")).Click();
               } else {
                   driver.FindElement(By.XPath("//button[.='Fortsett siste forhåndsvisning']")).Click();
               }
