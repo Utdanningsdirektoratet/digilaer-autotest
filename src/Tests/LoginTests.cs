@@ -137,7 +137,7 @@ namespace TestSuite
           if(!GlobalVariables.ErTiming())
           {
             LogWriter.LogWrite("Starter seleniumtest på en device i " + GlobalVariables.Miljo);
-            if(GlobalVariables.ErProd() && GlobalVariables.ErScheduled() && GlobalVariables.SkalLoggeTilDatabase())
+            if(GlobalVariables.ErProd() && GlobalVariables.SkalLoggeTilDatabase())
             {
                 enhetIdForDB =  MonitorApiClient.FindOrCreateEnhetOppsett(new EnhetOppsett{
                     enhet = bsCaps.device, nettleserNavn = bsCaps.browser, nettleserVersjon = bsCaps.browserVersion,
@@ -207,7 +207,7 @@ namespace TestSuite
           if(!GlobalVariables.ErTiming())
           {
             LogWriter.LogToBrowserStack(driver, TestContext.CurrentContext.Test.MethodName + " ferdig.");
-            if(GlobalVariables.ErProd()  && GlobalVariables.ErScheduled() && GlobalVariables.SkalLoggeTilDatabase())
+            if(GlobalVariables.ErProd() && GlobalVariables.SkalLoggeTilDatabase())
             {
                 funkTestIdForDB = MonitorApiClient.FindOrCreateFunksjonellTest(TestContext.CurrentContext.Test.MethodName, TestContext.CurrentContext.Test.Name);
 
