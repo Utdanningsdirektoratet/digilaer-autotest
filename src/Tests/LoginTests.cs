@@ -468,7 +468,7 @@ namespace TestSuite
               Thread.Sleep(3000);
               driver.FindElement(By.XPath("//button[.='Slå redigering på']")).Click();
               Thread.Sleep(2000); // HaandterMacSafari(); // For element stale exception on appium iphone.
-              ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//i[@aria-label='Rediger']"));
+              ReadOnlyCollection<IWebElement> redigerknapper = driver.FindElements(By.XPath("//*[@aria-label='Rediger']"));
               Assert.That(redigerknapper.Count, Is.GreaterThan(6));
               driver.FindElement(By.XPath("//button[.='Slå redigering av']")).Click();
 
